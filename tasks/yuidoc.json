@@ -1,0 +1,14 @@
+{
+  "name": "decal.js",
+  "description": "JS ORM",
+  "url": "http://decaljs.com",
+  "options": {
+    "paths": [
+      "src/core",
+      "src/dev",
+      "src/utils"
+    ],
+    "outdir": "./docs/api",
+    "lint" : false
+  }
+}
