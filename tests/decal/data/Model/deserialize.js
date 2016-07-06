@@ -10,9 +10,9 @@ describe('deserialize', function () {
             instance3,
             instance4;
 
-        Model = $b.Model({
-            a : $b.attr(),
-            b : $b.attr()
+        Model = decal.Model.extend({
+            a : decal.attr(),
+            b : decal.attr()
         });
 
         json = [
@@ -65,8 +65,8 @@ describe('deserialize', function () {
             Model,
             instance;
 
-        Model = $b.Model({
-            a : $b.attr({key : 'a.b.c.d'})
+        Model = decal.Model.extend({
+            a : decal.attr({key : 'a.b.c.d'})
         });
 
         json = {
@@ -93,7 +93,7 @@ describe('deserialize', function () {
         var Model,
             instance;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             primaryKey : 'uuid'
         });
 
@@ -111,10 +111,10 @@ describe('deserialize', function () {
             Model,
             instance;
 
-        Model = $b.Model({
-            a : $b.attr(),
-            b : $b.attr(),
-            c : $b.attr()
+        Model = decal.Model.extend({
+            a : decal.attr(),
+            b : decal.attr(),
+            c : decal.attr()
         });
 
         instance = Model.create({a : 0, b : 0, c : 0});
@@ -143,10 +143,10 @@ describe('deserialize', function () {
             Model,
             instance;
 
-        Model = $b.Model({
-            a : $b.attr(),
-            b : $b.attr(),
-            c : $b.attr()
+        Model = decal.Model.extend({
+            a : decal.attr(),
+            b : decal.attr(),
+            c : decal.attr()
         });
 
         instance = Model.create({a : 0, b : 0, c : 0});
@@ -175,14 +175,14 @@ describe('deserialize', function () {
             Model,
             instance;
 
-        Model = $b.Model({
-            a : $b.attr(),
-            b : $b.attr(),
-            c : $b.attr()
+        Model = decal.Model.extend({
+            a : decal.attr(),
+            b : decal.attr(),
+            c : decal.attr()
         });
 
         instance = Model.create({a : 0, b : 0, c : 0});
-        expect(instance.dirtyAttributes.content.length).to.equal(0);
+        expect(instance.dirtyAttributes.length).to.equal(0);
 
         instance.deserialize({a : 1, c: 3});
         expect(instance.dirtyAttributes.indexOf('a')).to.equal(-1);
@@ -199,8 +199,8 @@ describe('deserialize', function () {
             Model,
             instance;
 
-        Model = $b.Model({
-            a : $b.attr({key : 'a.b.c.d', readOnly: true})
+        Model = decal.Model.extend({
+            a : decal.attr({key : 'a.b.c.d', readOnly: true})
         });
 
         json = {
@@ -215,7 +215,7 @@ describe('deserialize', function () {
 
         instance = Model.create();
         instance.deserialize(json, false, function (meta) {
-            return !meta.options.readOnly;
+            return !meta.opts.readOnly;
         });
 
         expect(instance.serialize()).to.deep.equal({});

@@ -7,9 +7,9 @@ describe('add + remove', function () {
             store,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test',
-            idx : $b.attr()
+            idx : decal.attr()
         });
 
         instances = [];
@@ -18,10 +18,10 @@ describe('add + remove', function () {
             instances.push(Model.create({idx : i}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
-        expect(store.__store.tests.content).to.deep.equal(instances);
+        expect(store.__store.tests.toArray()).to.deep.equal(instances);
     });
 
     it('should properly remove records.', function () {
@@ -31,9 +31,9 @@ describe('add + remove', function () {
             store,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test',
-            idx : $b.attr()
+            idx : decal.attr()
         });
 
         instances = [];
@@ -42,15 +42,15 @@ describe('add + remove', function () {
             instances.push(Model.create({idx : i}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
-        expect(store.__store.tests.content).to.deep.equal(instances);
+        expect(store.__store.tests.toArray()).to.deep.equal(instances);
 
         store.remove('test', instances.splice(0, 5));
-        expect(store.__store.tests.content.length).to.equal(5);
+        expect(store.__store.tests.length).to.equal(5);
 
         store.remove('test', instances);
-        expect(store.__store.tests.content).to.not.deep.equal(instances);
+        expect(store.__store.tests.toArray()).to.not.deep.equal(instances);
     });
 });

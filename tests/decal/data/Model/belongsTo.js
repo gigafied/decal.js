@@ -3,7 +3,7 @@ describe('belongsTo', function () {
     var store;
 
     beforeEach(function () {
-        store = $b.Store.create();
+        store = decal.Store.create();
     });
 
     afterEach(function () {
@@ -17,22 +17,16 @@ describe('belongsTo', function () {
             lightInstance,
             switchInstance;
 
-        Light = $b.Model({
+        Light = decal.Model.extend({
             modelKey : 'light',
-
-            schema : $b.Schema.create({
-                isOn : $b.attr({defaultValue : false})
-            })
+            isOn : decal.attr({defaultValue : false})
         });
 
-        LightSwitch = $b.Model({
+        LightSwitch = decal.Model.extend({
 
             modelKey : 'lightSwitch',
             collectionKey : 'lightSwitches',
-
-            schema : $b.Schema.create({
-                light : $b.belongsTo('light')
-            }),
+            light : decal.belongsTo('light'),
 
             flip : function () {
                 this.light.isOn = !this.light.isOn;
@@ -45,9 +39,7 @@ describe('belongsTo', function () {
         switchInstance = LightSwitch.create();
         store.add('lightSwitch', switchInstance);
 
-        switchInstance.deserialize({
-            light : 1
-        });
+        switchInstance.deserialize({light : 1});
 
         expect(switchInstance.light).to.equal(lightInstance);
         expect(switchInstance.light.isOn).to.equal(false);
@@ -63,23 +55,16 @@ describe('belongsTo', function () {
             lightInstance,
             switchInstance;
 
-        Light = $b.Model({
+        Light = decal.Model.extend({
             modelKey : 'light',
-
-            schema : $b.Schema.create({
-                isOn : $b.attr({defaultValue : false})
-            })
+            isOn : decal.attr({defaultValue : false})
         });
 
-        LightSwitch = $b.Model({
+        LightSwitch = decal.Model.extend({
 
             modelKey : 'lightSwitch',
             collectionKey : 'lightSwitches',
-
-            schema : $b.Schema.create({
-                light : $b.belongsTo('light')
-            }),
-
+            light : decal.belongsTo('light'),
             flip : function () {
                 this.light.isOn = !this.light.isOn;
             }
@@ -106,23 +91,16 @@ describe('belongsTo', function () {
             LightSwitch,
             switchInstance;
 
-        Light = $b.Model({
+        Light = decal.Model.extend({
             modelKey : 'light',
-
-            schema : $b.Schema.create({
-                isOn : $b.attr({defaultValue : false})
-            })
+            isOn : decal.attr({defaultValue : false})
         });
 
-        LightSwitch = $b.Model({
+        LightSwitch = decal.Model.extend({
 
             modelKey : 'lightSwitch',
             collectionKey : 'lightSwitches',
-
-            schema : $b.Schema.create({
-                light : $b.belongsTo('light', {embedded : true})
-            }),
-
+            light : decal.belongsTo('light', {embedded : true}),
             flip : function () {
                 this.light.isOn = !this.light.isOn;
             }
@@ -152,24 +130,16 @@ describe('belongsTo', function () {
             LightSwitch,
             switchInstance;
 
-        Light = $b.Model({
+        Light = decal.Model.extend({
             modelKey : 'light',
-
-            schema : $b.Schema.create({
-                isOn : $b.attr({defaultValue : false})
-            })
-
+            isOn : decal.attr({defaultValue : false})
         });
 
-        LightSwitch = $b.Model({
+        LightSwitch = decal.Model.extend({
 
             modelKey : 'lightSwitch',
             collectionKey : 'lightSwitches',
-
-            schema : $b.Schema.create({
-                light : $b.belongsTo('light', {embedded : true})
-            }),
-
+            light : decal.belongsTo('light', {embedded : true}),
             flip : function () {
                 this.light.isOn = !this.light.isOn;
             }
@@ -204,26 +174,21 @@ describe('belongsTo', function () {
             LightSwitch,
             switchInstance;
 
-        Light = $b.Model({
+        Light = decal.Model.extend({
             modelKey : 'light',
-
-            schema : $b.Schema.create({
-                isOn : $b.attr({defaultValue : false}),
-                isDimmable : $b.attr({defaultValue : false, internal : true}),
-                voltage : $b.attr({readOnly: true})
-            })
+            isOn : decal.attr({defaultValue : false}),
+            isDimmable : decal.attr({defaultValue : false, internal : true}),
+            voltage : decal.attr({readOnly: true})
         });
 
-        LightSwitch = $b.Model({
+        LightSwitch = decal.Model.extend({
 
             modelKey : 'lightSwitch',
             collectionKey : 'lightSwitches',
 
-            schema : $b.Schema.create({
-                light : $b.belongsTo('light', {embedded : true}),
-                linkedTo : $b.belongsTo('light', {embedded: true, readOnly : true}),
-                linkedToNull : $b.belongsTo('light', {embedded: true, defaultValue : null})
-            }),
+            light : decal.belongsTo('light', {embedded : true}),
+            linkedTo : decal.belongsTo('light', {embedded: true, readOnly : true}),
+            linkedToNull : decal.belongsTo('light', {embedded: true, defaultValue : null}),
 
             flip : function () {
                 this.light.isOn = !this.light.isOn;
@@ -242,7 +207,7 @@ describe('belongsTo', function () {
             },
             linkedTo: {isOn: true, voltage: 123}
         }, false, function (meta) {
-            return !meta.options.readOnly;
+            return !meta.opts.readOnly;
         });
 
         switchInstance.flip();
@@ -251,7 +216,7 @@ describe('belongsTo', function () {
         switchInstance.linkedTo = Light.create({voltage: 345});
 
         json = switchInstance.serialize(function (meta) {
-            return !meta.options.internal;
+            return !meta.opts.internal;
         });
 
         expect(json).to.deep.equal({

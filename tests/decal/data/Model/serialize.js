@@ -7,10 +7,10 @@ describe('serialize', function () {
             expected,
             instance;
 
-        Model = $b.Model({
-            a : $b.attr({defaultValue : 'a'}),
-            b : $b.attr({defaultValue : 'b'}),
-            c : $b.attr({defaultValue : 'c'})
+        Model = decal.Model.extend({
+            a : decal.attr({defaultValue : 'a'}),
+            b : decal.attr({defaultValue : 'b'}),
+            c : decal.attr({defaultValue : 'c'})
         });
 
         instance = Model.create();
@@ -30,8 +30,8 @@ describe('serialize', function () {
             expected,
             instance;
 
-        Model = $b.Model({
-            a : $b.attr({key : 'a.b.c.d'})
+        Model = decal.Model.extend({
+            a : decal.attr({key : 'a.b.c.d'})
         });
 
         instance = Model.create();
@@ -60,7 +60,7 @@ describe('serialize', function () {
             expected,
             instance;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             primaryKey : 'uuid'
         });
 
@@ -84,8 +84,8 @@ describe('serialize', function () {
             expected,
             instance;
 
-        Model = $b.Model({
-            a : $b.attr({key : 'a.b.c.d', internal: true})
+        Model = decal.Model.extend({
+            a : decal.attr({key : 'a.b.c.d', internal: true})
         });
 
         instance = Model.create();
@@ -102,7 +102,7 @@ describe('serialize', function () {
         };
 
         json = instance.serialize(function (meta) {
-            return !meta.options.internal;
+            return !meta.opts.internal;
         });
         expect(json).to.deep.equal({});
 

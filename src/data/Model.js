@@ -246,7 +246,7 @@ let Model = Class.extend({
     }
   }),
 
-  __init (o) {
+  __init (props) {
 
     var p,
       desc,
@@ -254,12 +254,14 @@ let Model = Class.extend({
       attributes,
       relationships
 
+    this.__skipInit = true;
     this._super.call(this)
+    delete this.___skipInit;
 
-    let meta = this.meta()
+    let meta = this.__meta
     meta.data = {}
 
-    let cMeta = this.constructor.meta()
+    let cMeta = this.constructor.__meta = this.constructor.__meta || {}
 
     meta.isInitialized = false
 
@@ -293,20 +295,12 @@ let Model = Class.extend({
     }
 
     meta.pristineData = {}
-    meta.pristineContent = {}
 
-    if (typeof o === 'object') {
-      this.deserialize(o)
-    }
-
+    if (typeof props === 'object') this.deserialize(props)
     set(this, 'dirtyAttributes', DecalArray.create())
-
     meta.isInitialized = true
 
-    if (this.init) {
-      this.init.apply(this, arguments)
-    }
-
+    if (this.init) this.init.apply(this, arguments)
     return this
   },
 
@@ -334,7 +328,7 @@ let Model = Class.extend({
       attributes,
       relationships
 
-    meta = this.meta()
+    meta = this.__meta
 
     attributes = meta.attributes
     relationships = meta.relationships
@@ -390,7 +384,7 @@ let Model = Class.extend({
       attributes,
       relationships
 
-    meta = this.meta()
+    meta = this.__meta
 
     attributes = meta.attributes
     relationships = meta.relationships
@@ -445,11 +439,9 @@ let Model = Class.extend({
       attributes,
       relationships
 
-    meta = this.meta()
+    meta = this.__meta
 
-    if (!json) {
-      return this
-    }
+    if (!json) return this
 
     dirty = (get(this, 'dirtyAttributes') || []).concat()
     attributes = meta.attributes
@@ -485,7 +477,7 @@ let Model = Class.extend({
       set(this, 'pk', json[this.primaryKey])
     }
 
-    set(this, 'dirtyAttributes.content', dirty)
+    set(this, 'dirtyAttributes', dirty)
     set(this, 'isLoaded', true)
 
     return this
@@ -537,7 +529,7 @@ let Model = Class.extend({
       return this
     }
 
-    meta = this.meta()
+    meta = this.__meta
     relationships = meta.relationships
 
     i = relationships.length
@@ -580,7 +572,7 @@ let Model = Class.extend({
 
     return this.adapter.saveRecord(this).then(function (json) {
 
-      self.trigger('save', {
+      self.emit('save', {
         isNew: isNew,
         updates: dirty
       })
@@ -617,7 +609,7 @@ let Model = Class.extend({
 
       self.deserialize(json, !!override)
 
-      self.trigger('fetch')
+      self.emit('fetch')
 
       if (!!override) {
         self.undirty(true)
@@ -647,7 +639,7 @@ let Model = Class.extend({
 
     return this.adapter.deleteRecord(this).then(function () {
 
-      self.trigger('deleted')
+      self.emit('deleted')
 
       if (self.store) {
         self.store.remove(self)
@@ -696,7 +688,7 @@ let Model = Class.extend({
       attributes,
       relationships
 
-    meta = this.meta()
+    meta = this.__meta
 
     dirty = get(this, 'dirtyAttributes')
     attributes = meta.attributes
@@ -721,7 +713,7 @@ let Model = Class.extend({
       }
     }
 
-    this.trigger('revert')
+    this.emit('revert')
 
     return this
   },
@@ -737,11 +729,9 @@ let Model = Class.extend({
       dirty,
       relationships
 
-    if (this.isDestroyed) {
-      return
-    }
+    if (this.isDestroyed) return
 
-    meta = this.meta()
+    meta = this.__meta
     dirty = get(this, 'dirtyAttributes')
 
     relationships = meta.relationships

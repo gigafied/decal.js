@@ -8,9 +8,9 @@ describe('find + filter', function () {
             record,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test',
-            idx : $b.attr()
+            idx : decal.attr()
         });
 
         instances = [];
@@ -19,10 +19,10 @@ describe('find + filter', function () {
             instances.push(Model.create({idx : i}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
-        expect(store.all('test').content).to.deep.equal(instances);
+        expect(store.all('test').toArray()).to.deep.equal(instances);
 
         store.destroy(true);
     });
@@ -35,9 +35,9 @@ describe('find + filter', function () {
             record,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test',
-            idx : $b.attr()
+            idx : decal.attr()
         });
 
         instances = [];
@@ -46,13 +46,13 @@ describe('find + filter', function () {
             instances.push(Model.create({idx : i}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
-        expect(store.all('test').content).to.deep.equal(instances);
+        expect(store.all('test').toArray()).to.deep.equal(instances);
 
         store.clear();
-        expect(store.all('test').content).to.deep.equal([]);
+        expect(store.all('test').toArray()).to.deep.equal([]);
 
         store.destroy(true);
     });
@@ -65,9 +65,9 @@ describe('find + filter', function () {
             record,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test',
-            idx : $b.attr()
+            idx : decal.attr()
         });
 
         instances = [];
@@ -76,7 +76,7 @@ describe('find + filter', function () {
             instances.push(Model.create({idx : i}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
         record = store.find('test', {idx : 5});
@@ -94,7 +94,7 @@ describe('find + filter', function () {
             record,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test'
         });
 
@@ -104,7 +104,7 @@ describe('find + filter', function () {
             instances.push(Model.create({id : i}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
         record = store.find('test', 3);
@@ -122,9 +122,9 @@ describe('find + filter', function () {
             record,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test',
-            idx : $b.attr()
+            idx : decal.attr()
         });
 
         instances = [];
@@ -133,7 +133,7 @@ describe('find + filter', function () {
             instances.push(Model.create({idx : i}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
         record = store.find('test', function (item) {
@@ -155,10 +155,10 @@ describe('find + filter', function () {
             records,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test',
-            idx : $b.attr(),
-            hidden : $b.attr()
+            idx : decal.attr(),
+            hidden : decal.attr()
         });
 
         instances = [];
@@ -167,18 +167,18 @@ describe('find + filter', function () {
             instances.push(Model.create({idx : i, hidden : i < 5}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
         records = store.filter('test', {hidden : false});
 
         expect(records.length).to.equal(5);
 
-        expect(records.content[0]).to.equal(instances[5]);
-        expect(records.content[1]).to.equal(instances[6]);
-        expect(records.content[2]).to.equal(instances[7]);
-        expect(records.content[3]).to.equal(instances[8]);
-        expect(records.content[4]).to.equal(instances[9]);
+        expect(records[0]).to.equal(instances[5]);
+        expect(records[1]).to.equal(instances[6]);
+        expect(records[2]).to.equal(instances[7]);
+        expect(records[3]).to.equal(instances[8]);
+        expect(records[4]).to.equal(instances[9]);
 
         store.destroy(true);
 
@@ -193,10 +193,10 @@ describe('find + filter', function () {
             records,
             instances;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             modelKey : 'test',
-            idx : $b.attr(),
-            hidden : $b.attr()
+            idx : decal.attr(),
+            hidden : decal.attr()
         });
 
         instances = [];
@@ -205,7 +205,7 @@ describe('find + filter', function () {
             instances.push(Model.create({idx : i, hidden : i < 5}));
         }
 
-        store = $b.Store.create();
+        store = decal.Store.create();
         store.add('test', instances);
 
         records = store.filter('test', function (item) {
@@ -214,11 +214,11 @@ describe('find + filter', function () {
 
         expect(records.length).to.equal(5);
 
-        expect(records.content[0]).to.equal(instances[0]);
-        expect(records.content[1]).to.equal(instances[1]);
-        expect(records.content[2]).to.equal(instances[2]);
-        expect(records.content[3]).to.equal(instances[3]);
-        expect(records.content[4]).to.equal(instances[4]);
+        expect(records[0]).to.equal(instances[0]);
+        expect(records[1]).to.equal(instances[1]);
+        expect(records[2]).to.equal(instances[2]);
+        expect(records[3]).to.equal(instances[3]);
+        expect(records[4]).to.equal(instances[4]);
 
         store.destroy(true);
     });

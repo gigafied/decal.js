@@ -37,7 +37,7 @@ module.exports = function (obj, key) {
     if (!obj) return null
     if (obj instanceof CoreObject) {
       if (obj.isDestroyed) return null
-      let meta = obj.meta()
+      let meta = obj.__meta
       if (meta.getters[k]) obj = meta.getters[k].call(obj, k)
       else obj = meta.values[k]
     } else obj = obj[k]

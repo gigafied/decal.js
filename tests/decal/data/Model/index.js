@@ -1,9 +1,4 @@
-/*describe('Brink.Model', function () {
-
-    before(function () {
-
-    });
-
+describe('Brink.Model', function () {
     require('./defaults');
     require('./clone');
     require('./misc');
@@ -12,9 +7,4 @@
     require('./dirtyChecks');
     require('./belongsTo');
     require('./hasMany');
-
-    after(function () {
-
-    });
-});
-*/
+})

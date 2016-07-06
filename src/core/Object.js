@@ -13,14 +13,10 @@ const createDescriptor = require('../utils/createDescriptor')
 const CoreObject = require('./CoreObject')
 
 const IID = 0
-const METAS = new Map()
 
-function buildMeta (obj, meta) {
+function buildMeta (obj) {
 
-  if (!meta) meta = METAS.get(obj) || {}
-
-  meta = clone(meta)
-  METAS.set(obj, meta)
+  let meta = obj.__meta = clone(obj.__meta || {});
 
   meta.getters = clone(meta.getters || {})
   meta.setters = clone(meta.setters || {})
@@ -37,9 +33,7 @@ function buildMeta (obj, meta) {
 }
 
 function parsePrototype (obj) {
-  let meta = buildMeta(obj)
-  appendToMeta(obj, meta)
-  return meta
+  return appendToMeta(obj, buildMeta(obj))
 }
 
 function appendToMeta (props, meta, obj) {
@@ -55,8 +49,9 @@ function appendToMeta (props, meta, obj) {
         meta.methods.push(p)
         if (doSet) obj[p] = props[p]
       }
-    } else obj.prop(p, v)
+    } else if (p !== '__meta' && props.hasOwnProperty(p)) obj.prop(p, v)
   }
+  return meta
 }
 
 function defineProperty (obj, key, descriptor) {
@@ -68,19 +63,19 @@ function defineProperty (obj, key, descriptor) {
 }
 
 function watch (obj, props, fn) {
-  let meta = METAS.get(obj)
+  let meta = obj.__meta
   meta.watchers.set(fn, props)
   return fn
 }
 
 function unwatch (obj, ...fns) {
-  let meta = METAS.get(obj)
+  let meta = obj.__meta
   fns = flatten(fns)
   fns.forEach(fn => meta.watchers.delete(fn))
 }
 
 function unwatchAll (obj) {
-  let meta = METAS.get(obj)
+  let meta = obj.__meta
   meta.watchers.clear()
 }
 
@@ -115,8 +110,8 @@ let Obj = CoreObject.extend({
   ************************************************************************/
   __init (props) {
 
-    let meta = METAS.get(this)
-    meta = meta ? buildMeta(this, meta) : parsePrototype(this)
+    let meta = this.__meta
+    meta = meta ? buildMeta(this) : parsePrototype(this)
 
     if (props && typeof props === 'object' && !Array.isArray(props)) {
       appendToMeta(clone(props), meta, this)
@@ -124,7 +119,7 @@ let Obj = CoreObject.extend({
 
     for (let p in meta.properties) defineProperty(this, p, meta.properties[p])
 
-    if (this.init) this.init.apply(this, arguments)
+    if (this.init && !this.__skipInit) this.init.apply(this, arguments)
 
     meta.isInitialized = true
 
@@ -132,10 +127,6 @@ let Obj = CoreObject.extend({
   },
 
   init () {},
-
-  meta () {
-    return METAS.get(this)
-  },
 
   /***********************************************************************
   Gets a subset of properties on this object.
@@ -157,7 +148,7 @@ let Obj = CoreObject.extend({
       return o
     }
 
-    let meta = METAS.get(this)
+    let meta = this.__meta
 
     for (p in meta.properties) {
       o[p] = this.get(p)
@@ -180,7 +171,7 @@ let Obj = CoreObject.extend({
     key = obj[1]
     obj = obj[0] || this
 
-    let meta = METAS.get(obj)
+    let meta = obj.__meta
 
     if (typeof val === 'undefined' && typeof meta.properties[key] !== 'undefined') {
       return meta.properties[key]
@@ -216,10 +207,7 @@ let Obj = CoreObject.extend({
       obj.propertyDidChange(key)
     }
 
-    if (meta.isInitialized) {
-      console.log('defineProperty')
-      defineProperty(obj, key, val)
-    }
+    if (meta.isInitialized) defineProperty(obj, key, val)
 
     return val
   },
@@ -259,7 +247,7 @@ let Obj = CoreObject.extend({
   },
 
   propertyDidChange (prop) {
-    let meta = METAS.get(this)
+    let meta = this.__meta
     if (!meta.watchers.size) return
     if (~meta.changedProps.indexOf(prop)) return
     meta.changedProps.push(prop)
@@ -343,7 +331,7 @@ let Obj = CoreObject.extend({
   destroy (...args) {
     if (this.isDestroyed) return
     this.unwatchAll()
-    METAS.delete(this)
+    this.__meta = null
     this.isDestroyed = true
     CoreObject.prototype.destroy.call(this, ...args)
   }
@@ -430,15 +418,6 @@ Obj.extend = function () {
   parsePrototype(proto)
   proto.constructor = SubObj
   return SubObj
-}
-
-Obj.meta = function () {
-  let meta = METAS.get(this)
-  if (!meta) {
-    meta = {}
-    METAS.set(this, meta)
-  }
-  return meta
 }
 
 module.exports = Obj

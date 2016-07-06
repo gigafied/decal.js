@@ -56,7 +56,7 @@ function set (obj, key, val, quiet, skipCompare) {
     if (!skipCompare && get(obj, key) === val) return false
 
     if (obj instanceof CoreObject) {
-      meta = obj.meta()
+      meta = obj.__meta
       if (meta.setters[key]) meta.setters[key].call(obj, val, key)
       else meta.values[key] = val
       if (!quiet) obj.propertyDidChange(key)

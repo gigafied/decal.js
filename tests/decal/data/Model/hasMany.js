@@ -10,47 +10,47 @@ describe('hasMany', function () {
 
     before(function () {
 
-        User = $b.Model({
+        User = decal.Model.extend({
             modelKey : 'user',
-            name : $b.attr()
+            name : decal.attr()
         });
 
-        Comment = $b.Model({
+        Comment = decal.Model.extend({
             modelKey : 'comment',
-            content : $b.attr(),
-            author : $b.belongsTo('user'),
-            views: $b.hasMany('user', {internal: true}),
-            likes : $b.hasMany('user'),
-            showTo : $b.hasMany('user', {embedded: true, readOnly: true})
+            content : decal.attr(),
+            author : decal.belongsTo('user'),
+            views: decal.hasMany('user', {internal: true}),
+            likes : decal.hasMany('user'),
+            showTo : decal.hasMany('user', {embedded: true, readOnly: true})
         });
 
-        Permission = $b.Model({
+        Permission = decal.Model.extend({
             modelKey : 'permission',
-            user : $b.belongsTo('user'),
-            value : $b.attr(),
+            user : decal.belongsTo('user'),
+            value : decal.attr(),
 
-            canRead : $b.computed(function () {
+            canRead : decal.computed(function () {
                 return this.get('value') >= 1;
             }, 'value'),
 
-            canWrite : $b.computed(function () {
+            canWrite : decal.computed(function () {
                 return this.get('value') >= 2;
             }, 'value'),
 
-            canDelete : $b.computed(function () {
+            canDelete : decal.computed(function () {
                 return this.get('value') >= 3;
             }, 'value')
         });
 
-        Post = $b.Model({
+        Post = decal.Model.extend({
             modelKey : 'post',
-            content : $b.attr(),
-            author : $b.belongsTo('user'),
-            comments : $b.hasMany('comment', {embedded : true}),
-            likes : $b.hasMany('user'),
-            views: $b.hasMany('user', {internal: true}),
-            showTo : $b.hasMany('user', {readOnly: true}),
-            permissions : $b.hasMany('permission', {
+            content : decal.attr(),
+            author : decal.belongsTo('user'),
+            comments : decal.hasMany('comment', {embedded : true}),
+            likes : decal.hasMany('user'),
+            views: decal.hasMany('user', {internal: true}),
+            showTo : decal.hasMany('user', {readOnly: true}),
+            permissions : decal.hasMany('permission', {
                 map : {key : 'user', value : 'value'},
                 internal: true
             })
@@ -59,19 +59,21 @@ describe('hasMany', function () {
     });
 
     beforeEach(function () {
-        store = $b.Store.create();
+        store = decal.Store.create();
         emptyPostJSON = {
             comments: [],
             likes: [],
             views: [],
             permissions: {},
-            showTo: []
+            showTo: [],
+            author : null
         };
 
         emptyCommentJSON = {
             likes: [],
             showTo: [],
-            views: []
+            views: [],
+            author : null
         };
         store.addModels(Post, User, Comment, Permission);
     });
@@ -110,11 +112,11 @@ describe('hasMany', function () {
 
         expect(post.likes.length).to.equal(3);
 
-        expect(post.likes.get(0)).to.equal(users[2]);
-        expect(post.likes.get(1)).to.equal(users[1]);
-        expect(post.likes.get(2)).to.equal(users[4]);
+        expect(post.likes[0]).to.equal(users[2]);
+        expect(post.likes[1]).to.equal(users[1]);
+        expect(post.likes[2]).to.equal(users[4]);
 
-        expect(post.serialize()).to.deep.equal($b.extend(emptyPostJSON, json));
+        expect(post.serialize()).to.deep.equal(decal.extend(emptyPostJSON, json));
     });
 
     it('should properly deserialize and serialize embedded hasManys.', function () {
@@ -138,15 +140,15 @@ describe('hasMany', function () {
         post.deserialize(json);
 
         expect(post.comments.length).to.equal(5);
-        expect(post.comments.get(0).content).to.equal('comment 1');
-        expect(post.comments.get(1).content).to.equal('comment 2');
-        expect(post.comments.get(2).content).to.equal('comment 3');
-        expect(post.comments.get(3).content).to.equal('comment 4');
-        expect(post.comments.get(4).content).to.equal('comment 5');
+        expect(post.comments[0].content).to.equal('comment 1');
+        expect(post.comments[1].content).to.equal('comment 2');
+        expect(post.comments[2].content).to.equal('comment 3');
+        expect(post.comments[3].content).to.equal('comment 4');
+        expect(post.comments[4].content).to.equal('comment 5');
 
-        expectation = $b.extend(emptyPostJSON, json);
+        expectation = decal.extend(emptyPostJSON, json);
         expectation.comments.forEach(function (v, k, a) {
-            a[k] = $b.extend({}, emptyCommentJSON, v);
+            a[k] = decal.extend({}, emptyCommentJSON, v);
         });
 
         expect(post.serialize()).to.deep.equal(expectation);
@@ -183,17 +185,17 @@ describe('hasMany', function () {
         post.deserialize(json);
 
         expect(post.permissions.length).to.equal(4);
-        expect(post.permissions.get(1).user).to.equal(users[1]);
+        expect(post.permissions[1].user).to.equal(users[1]);
 
-        expect(post.permissions.get(0).canRead).to.equal(false);
-        expect(post.permissions.get(0).canWrite).to.equal(false);
-        expect(post.permissions.get(0).canDelete).to.equal(false);
+        expect(post.permissions[0].canRead).to.equal(false);
+        expect(post.permissions[0].canWrite).to.equal(false);
+        expect(post.permissions[0].canDelete).to.equal(false);
 
-        expect(post.permissions.get(3).canRead).to.equal(true);
-        expect(post.permissions.get(3).canWrite).to.equal(true);
-        expect(post.permissions.get(3).canDelete).to.equal(true);
+        expect(post.permissions[3].canRead).to.equal(true);
+        expect(post.permissions[3].canWrite).to.equal(true);
+        expect(post.permissions[3].canDelete).to.equal(true);
 
-        expect(post.serialize()).to.deep.equal($b.extend(emptyPostJSON, json));
+        expect(post.serialize()).to.deep.equal(decal.extend(emptyPostJSON, json));
     });
 
     it('should properly deserialize and serialize complex relationships.', function () {
@@ -224,13 +226,13 @@ describe('hasMany', function () {
         store.add('post', post);
         post.deserialize(json);
 
-        expect(post.comments.get(2)).to.be.an.instanceOf(Comment);
-        expect(post.comments.get(2).author).to.be.an.instanceOf(User);
-        expect(post.comments.get(0).likes.get(0)).to.be.an.instanceOf(User);
+        expect(post.comments[2]).to.be.an.instanceOf(Comment);
+        expect(post.comments[2].author).to.be.an.instanceOf(User);
+        expect(post.comments[0].likes[0]).to.be.an.instanceOf(User);
 
-        expectation = $b.extend(emptyPostJSON, json);
+        expectation = decal.extend(emptyPostJSON, json);
         expectation.comments.forEach(function (v, k, a) {
-            a[k] = $b.extend({}, emptyCommentJSON, v);
+            a[k] = decal.extend({}, emptyCommentJSON, v);
         });
 
         expect(post.serialize()).to.deep.equal(expectation);
@@ -268,18 +270,18 @@ describe('hasMany', function () {
 
         };
 
-        Post.likes = $b.hasMany('user', {internal: true});
+        Post.likes = decal.hasMany('user', {internal: true});
 
         post = Post.create();
         store.add('post', post);
         post.deserialize(json, false, function (meta) {
-            return !meta.options.readOnly;
+            return !meta.opts.readOnly;
         });
 
-        post.comments.content[3].showTo.content.push(User.create({name: 'bart'}));
+        post.comments[3].showTo.push(User.create({name: 'bart'}));
 
         expect(post.serialize(function (meta) {
-            return !meta.options.internal;
+            return !meta.opts.internal;
         })).to.deep.equal({
             author : 1,
             content : 'post...',
@@ -323,11 +325,11 @@ describe('hasMany', function () {
         store.add('post', post);
         post.deserialize(json);
 
-        post.comments.get(0).content = 'dasfsafsdafa';
+        post.comments[0].content = 'dasfsafsdafa';
 
-        originalSerialized = $b.extend(emptyPostJSON, json);
+        originalSerialized = decal.extend(emptyPostJSON, json);
         originalSerialized.comments.forEach(function (v, k, a) {
-            a[k] = $b.extend({}, emptyCommentJSON, v);
+            a[k] = decal.extend({}, emptyCommentJSON, v);
         });
 
         expect(post.serialize()).to.not.deep.equal(originalSerialized);

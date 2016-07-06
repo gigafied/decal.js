@@ -2,18 +2,13 @@ describe('defaults', function () {
 
     it('should populate records with default values.', function () {
 
-        var Model,
-            instance;
-
-        Model = $b.Model({
-            schema : $b.Schema.create({
-                a : $b.attr({defaultValue : 'a'}),
-                b : $b.attr({defaultValue : 'b'}),
-                c : $b.attr({defaultValue : 'c'})
-            })
+        let Model = decal.Model.extend({
+            a : decal.attr({defaultValue : 'a'}),
+            b : decal.attr({defaultValue : 'b'}),
+            c : decal.attr({defaultValue : 'c'})
         });
 
-        instance = Model.create();
+        let instance = Model.create();
 
         expect(instance.a).to.equal('a');
         expect(instance.b).to.equal('b');
@@ -24,19 +19,13 @@ describe('defaults', function () {
 
     it('should override defaults if values are specified.', function () {
 
-        var Model,
-            instance;
-
-        Model = $b.Model({
-
-            schema : $b.Schema.create({
-                a : $b.attr({defaultValue : 'a'}),
-                b : $b.attr({defaultValue : 'b'}),
-                c : $b.attr({defaultValue : 'c'})
-            })
+        let Model = decal.Model.extend({
+            a : decal.attr({defaultValue : 'a'}),
+            b : decal.attr({defaultValue : 'b'}),
+            c : decal.attr({defaultValue : 'c'})
         });
 
-        instance = Model.create({a : 'a2', b : 'b2'});
+        let instance = Model.create({a : 'a2', b : 'b2'});
 
         expect(instance.a).to.equal('a2');
         expect(instance.b).to.equal('b2');
@@ -47,21 +36,14 @@ describe('defaults', function () {
 
     it('should not dirty records when using default values.', function () {
 
-        var Model,
-            instance;
-
-        Model = $b.Model({
-            schema : $b.Schema.create({
-                a : $b.attr({defaultValue : 'a'}),
-                b : $b.attr({defaultValue : 'b'}),
-                c : $b.attr({defaultValue : 'c'})
-            })
+        let Model = decal.Model.extend({
+            a : decal.attr({defaultValue : 'a'}),
+            b : decal.attr({defaultValue : 'b'}),
+            c : decal.attr({defaultValue : 'c'})
         });
 
-        instance = Model.create();
-
+        let instance = Model.create();
         expect(instance.isDirty).to.equal(false);
-
         instance.destroy();
     });
 });

@@ -10,11 +10,9 @@ describe('clone', function () {
             instance3,
             instance4;
 
-        Model = $b.Model({
-            schema : $b.Schema.create({
-                a : $b.attr(),
-                b : $b.attr()
-            })
+        Model = decal.Model.extend({
+            a : decal.attr(),
+            b : decal.attr()
         });
 
         json = [
@@ -66,7 +64,7 @@ describe('clone', function () {
             instance3,
             instance4;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             primaryKey : 'uuid'
         });
 

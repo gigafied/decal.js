@@ -7,11 +7,11 @@ describe('misc', function () {
             expected,
             instance;
 
-        Model = $b.Model({
+        Model = decal.Model.extend({
             primaryKey : null,
-            a : $b.attr({defaultValue : 'a'}),
-            b : $b.attr({defaultValue : 'b'}),
-            c : $b.attr({defaultValue : 'c'})
+            a : decal.attr({defaultValue : 'a'}),
+            b : decal.attr({defaultValue : 'b'}),
+            c : decal.attr({defaultValue : 'c'})
         });
 
         instance = Model.create();

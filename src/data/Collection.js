@@ -19,9 +19,9 @@ module.exports = class Collection extends DecalArray {
     }
   }
 
-  __init () {
+  constructor (...args) {
+    super(...args)
     this.__recordsByPK = {}
-    BrinkArray.prototype.__init.apply(this, arguments)
   }
 
   findBy (key, val) {
@@ -90,7 +90,7 @@ module.exports = class Collection extends DecalArray {
   }
 
   destroy (destroyRecords) {
-    if (destroyRecords) for (let i = 0, l = this.length; i < l; i ++) this[i].destroy(true)
+    if (destroyRecords) this.forEach(item => item.destroy(true))
     super.destroy()
   }
 }

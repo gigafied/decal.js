@@ -10,7 +10,9 @@ module.exports = {
   // data
   Adapter:              require('./data/Adapter'),
   attr:                 require('./data/attr'),
+  belongsTo:            require('./data/belongsTo'),
   Collection:           require('./data/Collection'),
+  hasMany:              require('./data/hasMany'),
   Model:                require('./data/Model'),
   Store:                require('./data/Store'),
 

@@ -22,7 +22,7 @@ module.exports = function make(mKey, opts) {
     get (key) {
 
       let store = this.store
-      let meta = this.meta()
+      let meta = this.__meta
       let val = null
 
       if (typeof this.__meta.data[key] === 'undefined') {
@@ -53,7 +53,7 @@ module.exports = function make(mKey, opts) {
           dirty.push(key)
       }
 
-      if (store && !val instanceof store.__registry[mKey]) {
+      if (store && !(val instanceof store.__registry[mKey])) {
         if (typeof val !== 'string' && typeof val !== 'number') val = String(val)
         val = store.findOrCreate(mKey, val)
       }

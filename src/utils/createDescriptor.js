@@ -8,18 +8,18 @@ const assert = require('./assert');
 const isFunction = require('./isFunction')
 
 function defineGetter (obj, p, fn) {
-  if (isFunction(fn)) obj.meta().getters[p] = fn
+  if (isFunction(fn)) obj.__meta.getters[p] = fn
 
   return function () {
-    return obj.get(p);
+    return this.get(p);
   }
 }
 
 function defineSetter (obj, p, fn) {
-  if (isFunction(fn)) obj.meta().setters[p] = fn
+  if (isFunction(fn)) obj.__meta.setters[p] = fn
 
   return function (val) {
-    return obj.set(p, val);
+    return this.set(p, val);
   }
 }
 /***********************************************************************

@@ -26,20 +26,20 @@ module.exports = function make (type, opts) {
   let attr = computed({
 
     get (key) {
-      let meta = this.meta()
+      let meta = this.__meta
       let val = meta.data[key]
       return typeof val !== 'undefined' ? val : opts.defaultValue
     },
 
     set (val, key) {
-      let meta = this.meta()
+      let meta = this.__meta
       let dirty = get(this, 'dirtyAttributes')
       let data = meta.data
       let pristine = meta.pristineData
 
       if (dirty) {
         if (typeof pristine[key] !== 'undefined') {
-          dirtyIdx = dirty.indexOf(key)
+          let dirtyIdx = dirty.indexOf(key)
           if (pristine[key] === val && ~dirtyIdx) dirty.removeAt(dirtyIdx)
           else if (!~dirtyIdx) dirty.push(key)
         } else {
@@ -76,7 +76,7 @@ module.exports = function make (type, opts) {
 
     revert() {
       let meta = attr.meta()
-      let pristine = this.meta().pristineData
+      let pristine = this.__meta.pristineData
       if (pristine[meta.key]) set(this, meta.key, pristine[meta.key])
     }
   })
