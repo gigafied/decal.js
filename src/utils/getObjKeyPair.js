@@ -1,16 +1,10 @@
-/***********************************************************************
+/**
 @class decal
-************************************************************************/
 
-'use strict'
-
-const get = require('./get')
-
-/***********************************************************************
 Given an object and a 'nested property', return the sub-object and key name.
 
 ```javascript
-var obj = {
+let obj = {
     some : {
         nested : {
             key : 'test'
@@ -18,7 +12,7 @@ var obj = {
     }
 }
 
-console.log($b.getObjKeyPair(obj, 'some.nested.key')) // [ { key: 'test' }, 'key' ]
+console.log(decal.getObjKeyPair(obj, 'some.nested.key')) // [ { key: 'test' }, 'key' ]
 ```
 
 @method getObjKeyPair
@@ -26,16 +20,17 @@ console.log($b.getObjKeyPair(obj, 'some.nested.key')) // [ { key: 'test' }, 'key
 @param {String} key The nested key.
 @param {Boolean} [createIfNull=false] Whether to create objects for nested keys if the path would be invalid.
 @return {Array} An `Array` of `[obj, unNestedKeyName]`
-************************************************************************/
+*/
+
+'use strict'
+
+const get = require('./get')
 
 module.exports = function (obj, key, createIfNull) {
-  var i,
-    val
-
   key = key.split('.')
 
-  for (i = 0; i < key.length - 1; i++) {
-    val = get(obj, key[i])
+  for (let i = 0; i < key.length - 1; i++) {
+    let val = get(obj, key[i])
     if (val == null && createIfNull) {
       val = obj[key[i]] = {}
     }

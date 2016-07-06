@@ -1,6 +1,12 @@
-/***********************************************************************
+/**
 @class decal
-************************************************************************/
+
+Serializes an object into URL params (or request body)
+
+@method params
+@param {Object} obj The `Object` to serialize.
+@return {String} The serialized Object.
+*/
 
 'use strict'
 
@@ -10,22 +16,12 @@ function bodyEncode (s) {
   })
 }
 
-/***********************************************************************
-Serializes an object into URL params (or request body)
-
-@method params
-@param {Object} obj The `Object` to serialize.
-@return {String} The serialized Object.
-************************************************************************/
-
 module.exports = function (o, isBody) {
-  var p,
-    result,
-    encode = isBody ? bodyEncode : encodeURIComponent
+  let encode = isBody ? bodyEncode : encodeURIComponent
 
-  result = ''
+  let result = ''
 
-  for (p in o) {
+  for (let p in o) {
     result += (result ? '&' : '') + encode(p) + '=' + encode(o[p])
   }
 

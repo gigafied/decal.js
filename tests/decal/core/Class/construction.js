@@ -3,64 +3,47 @@
 const TestClass = require('./TestClass')
 
 describe('construction', function () {
+  it('should run the init method', function (done) {
+    let Class = TestClass.extend({
+      init: function () {
+        this.initialized = true
+      }
+    })
 
-    it('should run the init method', function (done) {
+    let instance = Class.extend().create()
+    expect(instance.initialized).to.be.ok
 
-        var Class,
-            instance;
+    instance.destroy()
+    done()
+  })
 
-        Class = TestClass.extend({
+  it('should run the __init() method before init()', function (done) {
+    let y = 0
+    let Class = TestClass.extend({
+      __init: function () {
+        expect(y).to.equal(0)
+        this._super()
+        expect(y).to.equal(1)
+      },
 
-            init : function () {
-                this.initialized = true;
-            }
-        });
+      init: function () {
+        y = 1
+        done()
+      }
+    })
 
-        instance = Class.extend().create();
+    Class.extend().create().destroy()
+  })
 
-        expect(instance.initialized).to.be.ok;
+  it('should be an instance of it\'s parent Classes', function (done) {
+    let Class = TestClass.extend({})
+    let instance = Class.extend().create()
 
-        instance.destroy();
-        done();
-    });
+    expect(instance).to.be.an.instanceof(Class)
+    expect(instance).to.be.an.instanceof(TestClass)
+    expect(instance).to.be.an.instanceof(decal.Class)
 
-    it('should run the __init() method before init()', function (done) {
-
-        var Class,
-            y = 0;
-
-        Class = TestClass.extend({
-
-            __init : function () {
-                expect(y).to.equal(0);
-                this._super();
-                expect(y).to.equal(1);
-            },
-
-            init : function () {
-                y = 1;
-                done();
-            }
-        });
-
-        Class.extend().create().destroy();
-    });
-
-    it('should be an instance of it\'s parent Classes', function (done) {
-
-        var Class,
-            instance;
-
-        Class = TestClass.extend({});
-
-        instance = Class.extend().create();
-
-        expect(instance).to.be.an.instanceof(Class);
-        expect(instance).to.be.an.instanceof(TestClass);
-        expect(instance).to.be.an.instanceof(decal.Class);
-
-        instance.destroy();
-        done();
-    });
-
-});
+    instance.destroy()
+    done()
+  })
+})

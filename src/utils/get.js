@@ -1,17 +1,11 @@
-/***********************************************************************
+/**
 @class decal
-************************************************************************/
 
-'use strict'
-
-const CoreObject = require('../core/CoreObject')
-
-/***********************************************************************
 Get a property or nested property on an object. Works on POJOs as well
 as `decal.Object` instances.
 
 ```javascript
-var obj = {
+let obj = {
     test : 'test',
     some : {
         nested : {
@@ -20,15 +14,19 @@ var obj = {
     }
 }
 
-console.log($b.get(obj, 'test')); // 'test'
-console.log($b.get(obj, 'some.nested.key')); // 'test2'
+console.log(decal.get(obj, 'test')); // 'test'
+console.log(decal.get(obj, 'some.nested.key')); // 'test2'
 ```
 
 @method get
 @param {Object} The object containing the property.
 @param {String} key The property or nested property to get.
 @return {Any} The value of the property.
-************************************************************************/
+*/
+
+'use strict'
+
+const CoreObject = require('../core/CoreObject')
 
 module.exports = function (obj, key) {
   key = key.split('.')

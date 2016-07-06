@@ -1,56 +1,38 @@
 describe('add + remove', function () {
+  it('should properly add records.', function () {
+    let Model = decal.Model.extend({
+      modelKey: 'test',
+      idx: decal.attr()
+    })
 
-    it('should properly add records.', function () {
+    let instances = []
 
-        var i,
-            Model,
-            store,
-            instances;
+    for (let i = 0; i < 10; i++) instances.push(Model.create({idx: i}))
 
-        Model = decal.Model.extend({
-            modelKey : 'test',
-            idx : decal.attr()
-        });
+    let store = decal.Store.create()
+    store.add('test', instances)
+    expect(store.__store.tests.toArray()).to.deep.equal(instances)
+  })
 
-        instances = [];
+  it('should properly remove records.', function () {
+    let Model = decal.Model.extend({
+      modelKey: 'test',
+      idx: decal.attr()
+    })
 
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({idx : i}));
-        }
+    let instances = []
 
-        store = decal.Store.create();
-        store.add('test', instances);
+    for (let i = 0; i < 10; i++) instances.push(Model.create({idx: i}))
 
-        expect(store.__store.tests.toArray()).to.deep.equal(instances);
-    });
+    let store = decal.Store.create()
+    store.add('test', instances)
 
-    it('should properly remove records.', function () {
+    expect(store.__store.tests.toArray()).to.deep.equal(instances)
 
-        var i,
-            Model,
-            store,
-            instances;
+    store.remove('test', instances.splice(0, 5))
+    expect(store.__store.tests.length).to.equal(5)
 
-        Model = decal.Model.extend({
-            modelKey : 'test',
-            idx : decal.attr()
-        });
-
-        instances = [];
-
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({idx : i}));
-        }
-
-        store = decal.Store.create();
-        store.add('test', instances);
-
-        expect(store.__store.tests.toArray()).to.deep.equal(instances);
-
-        store.remove('test', instances.splice(0, 5));
-        expect(store.__store.tests.length).to.equal(5);
-
-        store.remove('test', instances);
-        expect(store.__store.tests.toArray()).to.not.deep.equal(instances);
-    });
-});
+    store.remove('test', instances)
+    expect(store.__store.tests.toArray()).to.not.deep.equal(instances)
+  })
+})

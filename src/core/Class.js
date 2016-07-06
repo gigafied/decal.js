@@ -1,7 +1,6 @@
 'use strict'
 
 const Obj = require('./Object')
-const merge = require('../utils/merge')
 const bindFunction = require('../utils/bindFunction')
 
 function superfy (fn, superFn) {
@@ -29,7 +28,7 @@ let thisRE = (/\bthis\b/)
 
 let Class = Obj.extend({
 
-  /***********************************************************************
+  /**
   `decal.Class` provides several useful inheritance helpers
   and other utilities not found on `decal.Object`:
 
@@ -40,7 +39,7 @@ let Class = Obj.extend({
   @class decal.Class
   @extends decal.Object
   @constructor
-  ************************************************************************/
+  */
   __init: superfy(function () {
     this._super.apply(this, arguments)
 
@@ -49,7 +48,7 @@ let Class = Obj.extend({
         it every time an instance is created. It roughly doubles
         the time it takes to instantiate
 
-        We auto-bind by default on $b.Class and only if the method uses `this`.
+        We auto-bind by default on decal.Class and only if the method uses `this`.
     */
     if (this.__boundMethods && this.__boundMethods.length) {
       for (let i = this.__boundMethods.length - 1; i >= 0; i--) {

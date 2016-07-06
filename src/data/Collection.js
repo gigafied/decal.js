@@ -2,7 +2,6 @@
 
 const get = require('../utils/get')
 const set = require('../utils/set')
-const computed = require('../utils/computed')
 const DecalArray = require('../core/Array')
 
 module.exports = class Collection extends DecalArray {
@@ -25,7 +24,6 @@ module.exports = class Collection extends DecalArray {
   }
 
   findBy (key, val) {
-
     let isPK = key === 'pk'
     let record = isPK ? this.__recordsByPK[val] : null
 
@@ -38,7 +36,6 @@ module.exports = class Collection extends DecalArray {
   }
 
   push (...args) {
-
     for (let i = 0, l = args.length; i < l; i++) {
       let record = args[i]
       let pk = get(record, 'pk')
@@ -55,37 +52,28 @@ module.exports = class Collection extends DecalArray {
   }
 
   serialize (isEmbedded, filter, dirty) {
+    let a = []
+    let hasChanges = false
 
-    var a = [],
-      hasChanges
-
-    this.forEach(function (item) {
-
-      if (isEmbedded) {
-        a.push(dirty ? item.serializeDirty(filter) : item.serialize(filter))
-      }
-
-      else {
-        a.push(item.get('pk'))
-      }
-
+    this.forEach(item => {
+      if (isEmbedded) a.push(dirty ? item.serializeDirty(filter) : item.serialize(filter))
+      else a.push(item.get('pk'))
     })
 
     if (isEmbedded && dirty) {
       a.forEach(item => {
         if (Object.keys(item).length) { hasChanges = true }
       })
-      if (!hasChanges) { return }
+      if (!hasChanges) return
     }
-
     return a
   }
 
-  revertAll(revertRelationships) {
+  revertAll (revertRelationships) {
     this.forEach(item => item.revert(revertRelationships))
   }
 
-  undirty(recursive) {
+  undirty (recursive) {
     this.forEach(item => item.undirty(recursive))
   }
 

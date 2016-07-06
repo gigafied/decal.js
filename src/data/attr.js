@@ -1,20 +1,19 @@
-'use strict'
-
-const get = require('../utils/get')
-const set = require('../utils/set')
-const computed = require('../utils/computed')
-
-/***********************************************************************
+/**
 Define an attribute.
 
 @method attr
 @param  {Type} type The value type of the attribute.
 @param  {Object} opts Options for the attribute
 @return {ComputedProperty}
-************************************************************************/
+*/
+
+'use strict'
+
+const get = require('../utils/get')
+const set = require('../utils/set')
+const computed = require('../utils/computed')
 
 module.exports = function make (type, opts) {
-
   if (typeof type === 'object') {
     opts = type
     type = String
@@ -58,23 +57,23 @@ module.exports = function make (type, opts) {
     isAttribute: true,
     opts: opts,
 
-    serialize(filter) {
+    serialize (filter) {
       let meta = attr.meta()
       let key = meta.key
       let val = get(this, key)
       if (!filter || filter(meta, key, val)) return val
     },
 
-    serializeDirty(filter) {
+    serializeDirty (filter) {
       return attr.meta().serialize.call(this, filter, true)
     },
 
-    deserialize(val) {
+    deserialize (val) {
       set(this, attr.meta().key, val)
       return val
     },
 
-    revert() {
+    revert () {
       let meta = attr.meta()
       let pristine = this.__meta.pristineData
       if (pristine[meta.key]) set(this, meta.key, pristine[meta.key])

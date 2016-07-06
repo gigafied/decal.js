@@ -1,12 +1,12 @@
-'use strict';
+'use strict'
 
 const F = function () { }
 const Class = require('../core/Class')
 const warn = require('../utils/warn')
 
-module.exports = Class.extend({
+let Adapter = Class.extend({
 
-  /***********************************************************************
+  /**
 
   Adapters are how you interface with your persistence layer.
   Adapters receive requests from the store and perform the necessary actions,
@@ -25,10 +25,9 @@ module.exports = Class.extend({
 
   @module decal
   @submodule data
-  ************************************************************************/
+  */
 
-  __init() {
-
+  __init () {
     if (this.fetch === Adapter.prototype.fetch) {
       warn('Adapters must implement the `fetch()` method')
     }
@@ -49,87 +48,86 @@ module.exports = Class.extend({
       warn('Adapters must implement the `deleteRecord()` method')
     }
 
-    return this._super.apply(this, arguments);
+    return this._super.apply(this, arguments)
   },
 
-  /***********************************************************************
+  /**
   Fetches a record from the persistence layer.
 
   @method fetch
   @param  {Model} record The record you want to fetch.
   @return {Promise}
-  ************************************************************************/
-  fetch() {
-    return this.fetchRecord.apply(this, arguments);
+  */
+  fetch () {
+    return this.fetchRecord.apply(this, arguments)
   },
+
   fetchRecord: F,
 
-  /***********************************************************************
+  /**
   Fetches all records of a Model from the persistence layer.
 
   @method fetchAll
   @param  {ModelClass} Model The Class you want to fetch records of.
   @return {Promise}
-  ************************************************************************/
+  */
   fetchAll: F,
 
-  /***********************************************************************
+  /**
   Saves a new record to your persistence layer.
 
   @method createRecord
   @param  {Model} record The record you want to create.
   @return {Promise}
-  ************************************************************************/
+  */
 
   createRecord: F,
 
-  /***********************************************************************
+  /**
   Updates a record in your persistence layer.
 
   @method updateRecord
   @param  {Model} record The record you want to update.
   @return {Promise}
-  ************************************************************************/
+  */
 
   updateRecord: F,
 
-  /***********************************************************************
+  /**
   Deletes a record in your persistence layer.
 
   @method deleteRecord
   @param  {Model} record The record you want to delete.
   @return {Promise}
-  ************************************************************************/
+  */
 
   deleteRecord: F,
 
-  /***********************************************************************
+  /**
   Saves a record in your persistence layer.
 
   @method saveRecord
   @param  {Model} record The record you want to save. This will call createRecord()
   or updateRecord(), depending on whether or not the record is new.
   @return {Promise}
-  ************************************************************************/
+  */
 
-  saveRecord(record) {
-
-    if (record.get('isNew')) {
-      return this.createRecord(record);
-    }
-
-    return this.updateRecord(record);
+  saveRecord (record) {
+    if (record.get('isNew')) return this.createRecord(record)
+    return this.updateRecord(record)
   },
 
-  /***********************************************************************
+  /**
   Hook for doing anything you need to based on a new Model definition.
 
   @method registerModel
   @param  {Model} Model
-  ************************************************************************/
+  */
 
-  registerModel() {
+  registerModel () {
     // Hook for if you need to do any fancy pants stuff...
   }
 
-});
+})
+
+module.exports = Adapter

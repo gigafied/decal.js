@@ -1,89 +1,67 @@
 describe('find + filter', function () {
+  it('should find an item in an array', function () {
+    let a = decal.Array.create(
+      {val: 5},
+      {val: 3},
+      {val: 1},
+      {val: 4},
+      {val: 2}
+    )
 
-    it('should find an item in an array', function () {
+    let b = a.find(item => item.val === 1)
 
-        var a,
-            b;
+    expect(b).to.deep.equal({val: 1})
+    a.destroy()
+  })
 
-        a = decal.Array.create(
-            {val : 5},
-            {val : 3},
-            {val : 1},
-            {val : 4},
-            {val : 2}
-        );
+  it('should find an item in an array with findBy', function () {
+    let a = decal.Array.create(
+      {val: 5},
+      {val: 3},
+      {val: 1},
+      {val: 4},
+      {val: 2}
+    )
 
-        b = a.find(function (item) {
-            return item.val === 1;
-        });
+    let b = a.findBy('val', 3)
+    expect(b).to.deep.equal({val: 3})
+    a.destroy()
+  })
 
-        expect(b).to.deep.equal({val : 1});
-        a.destroy();
-    });
+  it('should filter an array properly', function () {
+    let a = decal.Array.create(
+      {val: 1, hidden: true},
+      {val: 2, hidden: false},
+      {val: 3, hidden: true},
+      {val: 4, hidden: false},
+      {val: 5, hidden: true}
+    )
 
-    it('should find an item in an array with findBy', function () {
+    let b = a.filter(item => !item.hidden)
 
-        var a,
-            b;
+    expect(b).to.deep.equal([
+      {val: 2, hidden: false},
+      {val: 4, hidden: false}
+    ])
+    a.destroy()
+  })
 
-        a = decal.Array.create(
-            {val : 5},
-            {val : 3},
-            {val : 1},
-            {val : 4},
-            {val : 2}
-        );
+  it('should filter an array with filterBy', function () {
+    let a = decal.Array.create(
+      {val: 1, hidden: true},
+      {val: 2, hidden: false},
+      {val: 3, hidden: true},
+      {val: 4, hidden: false},
+      {val: 5, hidden: true}
+    )
 
-        b = a.findBy('val', 3);
-        expect(b).to.deep.equal({val : 3});
-        a.destroy();
-    });
+    let b = a.filterBy('hidden', true)
 
-    it('should filter an array properly', function () {
-
-        var a,
-            b;
-
-        a = decal.Array.create(
-            {val : 1, hidden : true},
-            {val : 2, hidden : false},
-            {val : 3, hidden : true},
-            {val : 4, hidden : false},
-            {val : 5, hidden : true}
-        );
-
-        b = a.filter(function (item) {
-            return !item.hidden;
-        });
-
-        expect(b).to.deep.equal([
-            {val : 2, hidden : false},
-            {val : 4, hidden : false}
-        ]);
-        a.destroy();
-    });
-
-    it('should filter an array with filterBy', function () {
-
-        var a,
-            b;
-
-        a = decal.Array.create(
-            {val : 1, hidden : true},
-            {val : 2, hidden : false},
-            {val : 3, hidden : true},
-            {val : 4, hidden : false},
-            {val : 5, hidden : true}
-        );
-
-        b = a.filterBy('hidden', true);
-
-        expect(b).to.deep.equal([
-            {val : 1, hidden : true},
-            {val : 3, hidden : true},
-            {val : 5, hidden : true}
-        ]);
-        a.destroy();
-    });
-
-});
+    expect(b).to.deep.equal([
+      {val: 1, hidden: true},
+      {val: 3, hidden: true},
+      {val: 5, hidden: true}
+    ])
+    a.destroy()
+  })
+})

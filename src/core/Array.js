@@ -5,8 +5,8 @@ const EventEmitter = require('events')
 
 const EMITTER_METHODS = [
   'addListener', 'emit', 'eventNames', 'getMaxListeners', 'listenerCount', 'listeners',
-  'on', 'once', 'prependListener', 'prependOnceListener', 'removeAllListeners', 'removeListener','setMaxListeners'
-];
+  'on', 'once', 'prependListener', 'prependOnceListener', 'removeAllListeners', 'removeListener', 'setMaxListeners'
+]
 
 const EMITTERS = new Map()
 const LISTENERS = new Map()
@@ -127,8 +127,8 @@ class DecalArray extends Array {
     removed.forEach(item => onRemove(this, item))
 
     if (itemsToAdd && itemsToAdd.length) {
-      for (let i = itemsToAdd.length - 1; i >= 0; i --) {
-        super.splice(start, 0, itemsToAdd[i]);
+      for (let i = itemsToAdd.length - 1; i >= 0; i--) {
+        super.splice(start, 0, itemsToAdd[i])
       }
     }
 
@@ -149,7 +149,7 @@ class DecalArray extends Array {
 
   toArray () {
     let a = []
-    for (let i = 0; i < this.length; i ++) a.push(this[i])
+    for (let i = 0; i < this.length; i++) a.push(this[i])
     return a
   }
 

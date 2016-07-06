@@ -1,111 +1,72 @@
 describe('serialize', function () {
+  it('should properly serialize default values.', function (done) {
+    let Model = decal.Model.extend({
+      a: decal.attr({defaultValue: 'a'}),
+      b: decal.attr({defaultValue: 'b'}),
+      c: decal.attr({defaultValue: 'c'})
+    })
 
-    it('should properly serialize default values.', function (done) {
+    let instance = Model.create()
+    let expected = {a: 'a', b: 'b', c: 'c'}
+    let json = instance.serialize()
 
-        var json,
-            Model,
-            expected,
-            instance;
+    expect(json).to.deep.equal(expected)
+    done()
+  })
 
-        Model = decal.Model.extend({
-            a : decal.attr({defaultValue : 'a'}),
-            b : decal.attr({defaultValue : 'b'}),
-            c : decal.attr({defaultValue : 'c'})
-        });
+  it('should properly serialize nested keys.', function (done) {
+    let Model = decal.Model.extend({
+      a: decal.attr({key: 'a.b.c.d'})
+    })
 
-        instance = Model.create();
+    let instance = Model.create()
+    instance.a = 'test'
 
-        expected = {a : 'a', b : 'b', c : 'c'};
-        json = instance.serialize();
+    let expected = {
+      a: {
+        b: {
+          c: {
+            d: 'test'
+          }
+        }
+      }
+    }
 
-        expect(json).to.deep.equal(expected);
+    let json = instance.serialize()
+    expect(json).to.deep.equal(expected)
 
-        done();
-    });
+    done()
+  })
 
-    it('should properly serialize nested keys.', function (done) {
+  it('should properly serialize primary keys.', function (done) {
+    let Model = decal.Model.extend({
+      primaryKey: 'uuid'
+    })
 
-        var json,
-            Model,
-            expected,
-            instance;
+    let instance = Model.create()
+    instance.pk = 'xxx'
 
-        Model = decal.Model.extend({
-            a : decal.attr({key : 'a.b.c.d'})
-        });
+    let expected = {
+      uuid: 'xxx'
+    }
 
-        instance = Model.create();
-        instance.a = 'test';
+    let json = instance.serialize()
+    expect(json).to.deep.equal(expected)
 
-        expected = {
-            a : {
-                b : {
-                    c : {
-                        d : 'test'
-                    }
-                }
-            }
-        };
+    done()
+  })
 
-        json = instance.serialize();
-        expect(json).to.deep.equal(expected);
+  it('should properly filter nested keys', function (done) {
+    let Model = decal.Model.extend({
+      a: decal.attr({key: 'a.b.c.d', internal: true})
+    })
 
-        done();
-    });
+    let instance = Model.create()
+    instance.a = 'test'
 
-    it('should properly serialize primary keys.', function (done) {
+    let json = instance.serialize(meta => !meta.opts.internal)
+    expect(json).to.deep.equal({})
 
-        var json,
-            Model,
-            expected,
-            instance;
-
-        Model = decal.Model.extend({
-            primaryKey : 'uuid'
-        });
-
-        instance = Model.create();
-        instance.pk = 'xxx';
-
-        expected = {
-            uuid : 'xxx'
-        };
-
-        json = instance.serialize();
-        expect(json).to.deep.equal(expected);
-
-        done();
-    });
-
-    it('should properly filter nested keys', function (done) {
-
-        var json,
-            Model,
-            expected,
-            instance;
-
-        Model = decal.Model.extend({
-            a : decal.attr({key : 'a.b.c.d', internal: true})
-        });
-
-        instance = Model.create();
-        instance.a = 'test';
-
-        expected = {
-            a : {
-                b : {
-                    c : {
-                        d : 'test'
-                    }
-                }
-            }
-        };
-
-        json = instance.serialize(function (meta) {
-            return !meta.opts.internal;
-        });
-        expect(json).to.deep.equal({});
-
-        done();
-    });
-});
+    done()
+  })
+})

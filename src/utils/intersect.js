@@ -1,10 +1,6 @@
-/***********************************************************************
+/**
 @class decal
-************************************************************************/
 
-'use strict'
-
-/***********************************************************************
 Compare two arrays and return an `Array` with items that exist
 in both arrays.
 
@@ -12,25 +8,19 @@ in both arrays.
 @param {Array} arr1 The first `Array` to compare.
 @param {Array} arr2 The second `Array` to compare.
 @return {Array} `Array` of items that exist in both arrays.
-************************************************************************/
+*/
+
+'use strict'
 
 module.exports = function (a, b) {
-  var i,
-    c,
-    d
+  let c = []
+  let i = b.length
 
-  c = []
-  i = b.length
-
-  if (!a.length || !i) {
-    return c
-  }
+  if (!a.length || !i) return c
 
   while (i--) {
-    d = b[i]
-    if (~a.indexOf(d)) {
-      c.push(d)
-    }
+    let d = b[i]
+    if (~a.indexOf(d)) c.push(d)
   }
 
   return c

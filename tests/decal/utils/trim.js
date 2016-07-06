@@ -1,14 +1,8 @@
 describe('trim', function () {
+  it('should properly trim strings.', function () {
+    let actual = decal.trim('     hello world     .   ')
+    let expected = 'hello world     .'
 
-    it('should properly trim strings.', function () {
-
-        var actual,
-            expected;
-
-        actual = decal.trim('     hello world     .   ');
-        expected = 'hello world     .';
-
-        expect(actual).to.equal(expected);
-    });
-
-});
+    expect(actual).to.equal(expected)
+  })
+})

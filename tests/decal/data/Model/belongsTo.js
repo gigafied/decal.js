@@ -1,233 +1,191 @@
 describe('belongsTo', function () {
+  let store
 
-    var store;
+  beforeEach(function () {
+    store = decal.Store.create()
+  })
 
-    beforeEach(function () {
-        store = decal.Store.create();
-    });
+  afterEach(function () {
+    store.destroy(true)
+  })
 
-    afterEach(function () {
-        store.destroy(true);
-    });
+  it('should properly deserialize belongsTos.', function () {
+    let Light = decal.Model.extend({
+      modelKey: 'light',
+      isOn: decal.attr({defaultValue: false})
+    })
 
-    it('should properly deserialize belongsTos.', function () {
+    let LightSwitch = decal.Model.extend({
+      modelKey: 'lightSwitch',
+      collectionKey: 'lightSwitches',
+      light: decal.belongsTo('light'),
 
-        var Light,
-            LightSwitch,
-            lightInstance,
-            switchInstance;
+      flip: function () {
+        this.light.isOn = !this.light.isOn
+      }
+    })
 
-        Light = decal.Model.extend({
-            modelKey : 'light',
-            isOn : decal.attr({defaultValue : false})
-        });
+    let lightInstance = Light.create({id: 1})
+    store.add('light', lightInstance)
 
-        LightSwitch = decal.Model.extend({
+    let switchInstance = LightSwitch.create()
+    store.add('lightSwitch', switchInstance)
 
-            modelKey : 'lightSwitch',
-            collectionKey : 'lightSwitches',
-            light : decal.belongsTo('light'),
+    switchInstance.deserialize({light: 1})
 
-            flip : function () {
-                this.light.isOn = !this.light.isOn;
-            }
-        });
+    expect(switchInstance.light).to.equal(lightInstance)
+    expect(switchInstance.light.isOn).to.equal(false)
+    switchInstance.flip()
+    expect(switchInstance.light.isOn).to.equal(true)
+  })
 
-        lightInstance = Light.create({id : 1});
-        store.add('light', lightInstance);
+  it('should properly serialize belongsTos.', function () {
+    let Light = decal.Model.extend({
+      modelKey: 'light',
+      isOn: decal.attr({defaultValue: false})
+    })
 
-        switchInstance = LightSwitch.create();
-        store.add('lightSwitch', switchInstance);
+    let LightSwitch = decal.Model.extend({
+      modelKey: 'lightSwitch',
+      collectionKey: 'lightSwitches',
+      light: decal.belongsTo('light'),
+      flip: function () {
+        this.light.isOn = !this.light.isOn
+      }
+    })
 
-        switchInstance.deserialize({light : 1});
+    let lightInstance = Light.create({id: 1})
+    store.add('light', lightInstance)
 
-        expect(switchInstance.light).to.equal(lightInstance);
-        expect(switchInstance.light.isOn).to.equal(false);
-        switchInstance.flip();
-        expect(switchInstance.light.isOn).to.equal(true);
-    });
+    let switchInstance = LightSwitch.create()
+    store.add('lightSwitch', switchInstance)
 
-    it('should properly serialize belongsTos.', function () {
+    switchInstance.deserialize({
+      light: 1
+    })
 
-        var json,
-            Light,
-            LightSwitch,
-            lightInstance,
-            switchInstance;
+    let json = switchInstance.serialize()
+    expect(json).to.deep.equal({light: 1})
+  })
 
-        Light = decal.Model.extend({
-            modelKey : 'light',
-            isOn : decal.attr({defaultValue : false})
-        });
+  it('should properly deserialize embedded belongsTos.', function () {
+    let Light = decal.Model.extend({
+      modelKey: 'light',
+      isOn: decal.attr({defaultValue: false})
+    })
 
-        LightSwitch = decal.Model.extend({
+    let LightSwitch = decal.Model.extend({
+      modelKey: 'lightSwitch',
+      collectionKey: 'lightSwitches',
+      light: decal.belongsTo('light', {embedded: true}),
+      flip: function () {
+        this.light.isOn = !this.light.isOn
+      }
+    })
 
-            modelKey : 'lightSwitch',
-            collectionKey : 'lightSwitches',
-            light : decal.belongsTo('light'),
-            flip : function () {
-                this.light.isOn = !this.light.isOn;
-            }
-        });
+    store.addModels(Light, LightSwitch)
 
-        lightInstance = Light.create({id : 1});
-        store.add('light', lightInstance);
+    let switchInstance = LightSwitch.create()
+    store.add('lightSwitch', switchInstance)
 
-        switchInstance = LightSwitch.create();
-        store.add('lightSwitch', switchInstance);
+    switchInstance.deserialize({
+      light: {
+        isOn: true
+      }
+    })
 
-        switchInstance.deserialize({
-            light : 1
-        });
+    expect(switchInstance.light).to.be.an.instanceof(Light)
+    expect(switchInstance.light.isOn).to.equal(true)
+    switchInstance.flip()
+    expect(switchInstance.light.isOn).to.equal(false)
+  })
 
-        json = switchInstance.serialize();
+  it('should properly serialize embedded belongsTos.', function () {
+    let Light = decal.Model.extend({
+      modelKey: 'light',
+      isOn: decal.attr({defaultValue: false})
+    })
 
-        expect(json).to.deep.equal({light : 1});
-    });
+    let LightSwitch = decal.Model.extend({
+      modelKey: 'lightSwitch',
+      collectionKey: 'lightSwitches',
+      light: decal.belongsTo('light', {embedded: true}),
+      flip: function () {
+        this.light.isOn = !this.light.isOn
+      }
+    })
 
-    it('should properly deserialize embedded belongsTos.', function () {
+    store.addModels(Light, LightSwitch)
 
-        var Light,
-            LightSwitch,
-            switchInstance;
+    let switchInstance = LightSwitch.create()
+    store.add('lightSwitch', switchInstance)
 
-        Light = decal.Model.extend({
-            modelKey : 'light',
-            isOn : decal.attr({defaultValue : false})
-        });
+    switchInstance.deserialize({
+      light: {
+        isOn: true
+      }
+    })
 
-        LightSwitch = decal.Model.extend({
+    switchInstance.flip()
 
-            modelKey : 'lightSwitch',
-            collectionKey : 'lightSwitches',
-            light : decal.belongsTo('light', {embedded : true}),
-            flip : function () {
-                this.light.isOn = !this.light.isOn;
-            }
-        });
+    let json = switchInstance.serialize()
+    expect(json).to.deep.equal({light: {isOn: false}})
+  })
 
-        store.addModels(Light, LightSwitch);
+  it('should allow filtering.', function () {
+    let Light = decal.Model.extend({
+      modelKey: 'light',
+      isOn: decal.attr({defaultValue: false}),
+      isDimmable: decal.attr({defaultValue: false, internal: true}),
+      voltage: decal.attr({readOnly: true})
+    })
 
-        switchInstance = LightSwitch.create();
-        store.add('lightSwitch', switchInstance);
+    let LightSwitch = decal.Model.extend({
+      modelKey: 'lightSwitch',
+      collectionKey: 'lightSwitches',
 
-        switchInstance.deserialize({
-            light : {
-                isOn : true
-            }
-        });
+      light: decal.belongsTo('light', {embedded: true}),
+      linkedTo: decal.belongsTo('light', {embedded: true, readOnly: true}),
+      linkedToNull: decal.belongsTo('light', {embedded: true, defaultValue: null}),
 
-        expect(switchInstance.light).to.be.an.instanceof(Light);
-        expect(switchInstance.light.isOn).to.equal(true);
-        switchInstance.flip();
-        expect(switchInstance.light.isOn).to.equal(false);
-    });
+      flip: function () {
+        this.light.isOn = !this.light.isOn
+      }
+    })
 
-    it('should properly serialize embedded belongsTos.', function () {
+    store.addModels(Light, LightSwitch)
 
-        var json,
-            Light,
-            LightSwitch,
-            switchInstance;
+    let switchInstance = LightSwitch.create()
+    store.add('lightSwitch', switchInstance)
 
-        Light = decal.Model.extend({
-            modelKey : 'light',
-            isOn : decal.attr({defaultValue : false})
-        });
+    switchInstance.deserialize({
+      light: {
+        isOn: true,
+        voltage: 1.2
+      },
+      linkedTo: {isOn: true, voltage: 123}
+    }, false, function (meta) {
+      return !meta.opts.readOnly
+    })
 
-        LightSwitch = decal.Model.extend({
+    switchInstance.flip()
+    expect(switchInstance.linkedTo).to.be.an.instanceOf(Light)
+    expect(switchInstance.linkedToNull).to.equal(null)
+    switchInstance.linkedTo = Light.create({voltage: 345})
 
-            modelKey : 'lightSwitch',
-            collectionKey : 'lightSwitches',
-            light : decal.belongsTo('light', {embedded : true}),
-            flip : function () {
-                this.light.isOn = !this.light.isOn;
-            }
-        });
+    let json = switchInstance.serialize(function (meta) {
+      return !meta.opts.internal
+    })
 
-        store.addModels(Light, LightSwitch);
-
-        switchInstance = LightSwitch.create();
-        store.add('lightSwitch', switchInstance);
-
-        switchInstance.deserialize({
-            light : {
-                isOn : true
-            }
-        });
-
-        switchInstance.flip();
-
-        json = switchInstance.serialize();
-
-        expect(json).to.deep.equal({
-            light : {
-                isOn : false
-            }
-        });
-    });
-
-    it('should allow filtering.', function () {
-
-        var json,
-            Light,
-            LightSwitch,
-            switchInstance;
-
-        Light = decal.Model.extend({
-            modelKey : 'light',
-            isOn : decal.attr({defaultValue : false}),
-            isDimmable : decal.attr({defaultValue : false, internal : true}),
-            voltage : decal.attr({readOnly: true})
-        });
-
-        LightSwitch = decal.Model.extend({
-
-            modelKey : 'lightSwitch',
-            collectionKey : 'lightSwitches',
-
-            light : decal.belongsTo('light', {embedded : true}),
-            linkedTo : decal.belongsTo('light', {embedded: true, readOnly : true}),
-            linkedToNull : decal.belongsTo('light', {embedded: true, defaultValue : null}),
-
-            flip : function () {
-                this.light.isOn = !this.light.isOn;
-            }
-        });
-
-        store.addModels(Light, LightSwitch);
-
-        switchInstance = LightSwitch.create();
-        store.add('lightSwitch', switchInstance);
-
-        switchInstance.deserialize({
-            light : {
-                isOn : true,
-                voltage: 1.2
-            },
-            linkedTo: {isOn: true, voltage: 123}
-        }, false, function (meta) {
-            return !meta.opts.readOnly;
-        });
-
-        switchInstance.flip();
-        expect(switchInstance.linkedTo).to.be.an.instanceOf(Light);
-        expect(switchInstance.linkedToNull).to.equal(null);
-        switchInstance.linkedTo = Light.create({voltage: 345});
-
-        json = switchInstance.serialize(function (meta) {
-            return !meta.opts.internal;
-        });
-
-        expect(json).to.deep.equal({
-            light : {
-                isOn : false
-            },
-            linkedTo: {
-                isOn: false,
-                voltage: 345
-            },
-            linkedToNull : null
-        });
-    });
-});
+    expect(json).to.deep.equal({
+      light: {
+        isOn: false
+      },
+      linkedTo: {
+        isOn: false,
+        voltage: 345
+      },
+      linkedToNull: null
+    })
+  })
+})

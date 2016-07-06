@@ -1,42 +1,28 @@
 const TestObj = require('./TestObj')
 
 describe('construction', function () {
+  it('should run the init method', function () {
+    let Obj = TestObj.extend({
+      a: 'test',
 
-    it('should run the init method', function () {
+      init: function () {
+        this.initialized = true
+      }
+    })
 
-        var Obj,
-            instance;
+    let instance = Obj.extend({}).create()
+    expect(instance.initialized).to.be.ok
+    instance.destroy()
+  })
 
-        Obj = TestObj.extend({
+  it('should be an instance of it\'s parent Classes', function () {
+    let Obj = TestObj.extend({})
+    let instance = Obj.extend({}).create()
 
-            a : 'test',
+    expect(instance).to.be.an.instanceof(Obj)
+    expect(instance).to.be.an.instanceof(TestObj)
+    expect(instance).to.be.an.instanceof(decal.Object)
 
-            init : function () {
-                this.initialized = true;
-            }
-        });
-
-        instance = Obj.extend({}).create();
-
-        expect(instance.initialized).to.be.ok;
-
-        instance.destroy();
-    });
-
-    it('should be an instance of it\'s parent Classes', function () {
-
-        var Obj,
-            instance;
-
-        Obj = TestObj.extend({})
-
-        instance = Obj.extend({}).create();
-
-        expect(instance).to.be.an.instanceof(Obj);
-        expect(instance).to.be.an.instanceof(TestObj);
-        expect(instance).to.be.an.instanceof(decal.Object);
-
-        instance.destroy();
-    });
-
-});
+    instance.destroy()
+  })
+})

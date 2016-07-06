@@ -5,7 +5,7 @@
   "options": {
     "paths": [
       "src/core",
-      "src/dev",
+      "src/data",
       "src/utils"
     ],
     "outdir": "./docs/api",

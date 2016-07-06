@@ -1,78 +1,65 @@
 describe('isDirty/isClean', function () {
+  it('should return isDirty === true and isClean === false on dirty properties.', function (done) {
+    let Model = decal.Model.extend({
+      a: decal.attr({defaultValue: 1})
+    })
 
-    it('should return isDirty === true and isClean === false on dirty properties.', function (done) {
+    let instance = Model.create()
 
-        var Model,
-            instance;
+    instance.a = 3
 
-        Model = decal.Model.extend({
-            a : decal.attr({defaultValue : 1})
-        });
+    expect(instance.isDirty).to.equal(true)
+    expect(instance.isClean).to.equal(false)
+    done()
+  })
 
-        instance = Model.create();
+  it('should list all dirty properties in dirtyAttributes.', function (done) {
+    let Model = decal.Model.extend({
+      a: decal.attr({defaultValue: 1}),
+      b: decal.attr({defaultValue: 2}),
+      c: decal.attr({defaultValue: 3})
+    })
 
-        instance.a = 3;
+    let instance = Model.create()
 
-        expect(instance.isDirty).to.equal(true);
-        expect(instance.isClean).to.equal(false);
-        done();
-    });
+    instance.a = 3
+    instance.b = 2
+    instance.c = 1
 
-    it('should list all dirty properties in dirtyAttributes.', function (done) {
+    expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a', 'c'])
+    done()
+  })
 
-        var Model,
-            instance;
+  it('should unflag dirty properties if they are no longer dirty.', function (done) {
+    let Model = decal.Model.extend({
+      a: decal.attr({defaultValue: 1}),
+      b: decal.attr({defaultValue: 2}),
+      c: decal.attr({defaultValue: 3})
+    })
 
-        Model = decal.Model.extend({
-            a : decal.attr({defaultValue : 1}),
-            b : decal.attr({defaultValue : 2}),
-            c : decal.attr({defaultValue : 3})
-        });
+    let instance = Model.create()
 
-        instance = Model.create();
+    instance.a = 3
+    instance.b = 2
+    instance.c = 1
 
-        instance.a = 3;
-        instance.b = 2;
-        instance.c = 1;
+    expect(instance.isDirty).to.equal(true)
+    expect(instance.isClean).to.equal(false)
+    expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a', 'c'])
 
-        expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a', 'c']);
-        done();
-    });
+    instance.a = 1
+    instance.b = 2
+    instance.c = 3
 
-    it('should unflag dirty properties if they are no longer dirty.', function (done) {
+    expect(instance.dirtyAttributes.toArray()).to.deep.equal([])
+    expect(instance.isDirty).to.equal(false)
+    expect(instance.isClean).to.equal(true)
 
-        var Model,
-            instance;
+    instance.a = 5
+    expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a'])
+    expect(instance.isDirty).to.equal(true)
+    expect(instance.isClean).to.equal(false)
 
-        Model = decal.Model.extend({
-            a : decal.attr({defaultValue : 1}),
-            b : decal.attr({defaultValue : 2}),
-            c : decal.attr({defaultValue : 3})
-        });
-
-        instance = Model.create();
-
-        instance.a = 3;
-        instance.b = 2;
-        instance.c = 1;
-
-        expect(instance.isDirty).to.equal(true);
-        expect(instance.isClean).to.equal(false);
-        expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a', 'c']);
-
-        instance.a = 1;
-        instance.b = 2;
-        instance.c = 3;
-
-        expect(instance.dirtyAttributes.toArray()).to.deep.equal([]);
-        expect(instance.isDirty).to.equal(false);
-        expect(instance.isClean).to.equal(true);
-
-        instance.a = 5;
-        expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a']);
-        expect(instance.isDirty).to.equal(true);
-        expect(instance.isClean).to.equal(false);
-
-        done();
-    });
-});
+    done()
+  })
+})

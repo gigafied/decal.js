@@ -12,11 +12,8 @@ const createDescriptor = require('../utils/createDescriptor')
 
 const CoreObject = require('./CoreObject')
 
-const IID = 0
-
 function buildMeta (obj) {
-
-  let meta = obj.__meta = clone(obj.__meta || {});
+  let meta = obj.__meta = clone(obj.__meta || {})
 
   meta.getters = clone(meta.getters || {})
   meta.setters = clone(meta.setters || {})
@@ -99,7 +96,7 @@ function notifyWatchers (obj, meta) {
 
 let Obj = CoreObject.extend({
 
-  /***********************************************************************
+  /**
 
   `decal.Object` is the primary base Class. Most of your Objects will
   extend this Class, unless you need the added functionality of decal.Class.
@@ -107,9 +104,8 @@ let Obj = CoreObject.extend({
   @class decal.Object
   @extends decal.CoreObject
   @constructor
-  ************************************************************************/
+  */
   __init (props) {
-
     let meta = this.__meta
     meta = meta ? buildMeta(this) : parsePrototype(this)
 
@@ -128,45 +124,39 @@ let Obj = CoreObject.extend({
 
   init () {},
 
-  /***********************************************************************
+  /**
   Gets a subset of properties on this object.
 
   @method getProperties
   @param {Array} keys A listof keys you want to get
   @return {Object} Object of key : value pairs for properties in `keys`.
-  ************************************************************************/
+  */
   getProperties (...args) {
-
     let o = {}
-
     if (args.length) {
       let props = flatten(args)
       for (let i = 0; i < props.length; i++) {
         o[props[i]] = this.get(props[i])
       }
-
       return o
     }
 
     let meta = this.__meta
-
-    for (p in meta.properties) {
+    for (let p in meta.properties) {
       o[p] = this.get(p)
     }
-
     return o
   },
 
-  /***********************************************************************
+  /**
   Get or create a property descriptor.
 
   @method prop
   @param {String} key Poperty name.
   @param [val] Default value to use for the property.
   @return {PropertyDescriptor}
-  ************************************************************************/
+  */
   prop (key, val) {
-
     let obj = getObjKeyPair(this, key)
     key = obj[1]
     obj = obj[0] || this
@@ -196,7 +186,7 @@ let Obj = CoreObject.extend({
     let watched = val.watch
     let l
     if (watched && (l = watched.length)) {
-      for (let i = 0; i < l; i ++) {
+      for (let i = 0; i < l; i++) {
         let p = watched[i]
         meta.computed[p] = meta.computed[p] || []
         meta.computed[p].push(key)
@@ -212,7 +202,7 @@ let Obj = CoreObject.extend({
     return val
   },
 
-  /***********************************************************************
+  /**
   Get the value of a property.
 
   This is identical to doing `obj.key` or `obj[key]`,
@@ -226,7 +216,7 @@ let Obj = CoreObject.extend({
     return get(this, key)
   },
 
-  /***********************************************************************
+  /**
   Set the value of a property.
 
   This is identical to doing `obj.key = val` or `obj[key] = val`,
@@ -254,10 +244,10 @@ let Obj = CoreObject.extend({
     notifyWatchers(this, meta)
   },
 
-  /***********************************************************************
+  /**
   Watch a property or properties for changes.
   ```javascript
-  var obj = $b.Object.create({
+  let obj = decal.Object.create({
       color : 'green',
       firstName : 'Joe',
       lastName : 'Schmoe',
@@ -285,7 +275,6 @@ let Obj = CoreObject.extend({
   @param {Function} fn The function to call upon property changes.
   ***********************************************************************/
   watch (...args) {
-
     let fn = args[1]
     let props = args[0]
 
@@ -294,10 +283,10 @@ let Obj = CoreObject.extend({
       props = args.length === 1 ? [] : expandProps(flatten[args.concat()])
     } else props = expandProps(props.concat())
 
-    return watch(this, props, fn);
+    return watch(this, props, fn)
   },
 
-  /***********************************************************************
+  /**
   Remove a watcher.
   @method unwatch
   @param {Function|Array} fns The function(s) you no longer want to trigger on property changes.
@@ -306,7 +295,7 @@ let Obj = CoreObject.extend({
     unwatch(this, ...args)
   },
 
-  /***********************************************************************
+  /**
   Remove all watchers watching properties this object.
   USE WITH CAUTION.
   This gets called automatically during `destroy()`, it's not very common
@@ -320,7 +309,7 @@ let Obj = CoreObject.extend({
     unwatchAll(this)
   },
 
-  /***********************************************************************
+  /**
   Destroys an object, removes all bindings and watchers and clears all metadata.
 
   In addition to calling `destroy()` be sure to remove all
@@ -337,7 +326,7 @@ let Obj = CoreObject.extend({
   }
 })
 
-/***********************************************************************
+/**
 Extends an object's prototype and creates a new subclass.
 
 The new subclass will inherit all properties and methods of the Object being
@@ -345,7 +334,7 @@ extended.
 
 ```javascript
 
-let Animal = $b.Object.extend({
+let Animal = decal.Object.extend({
 
     numLegs : 4,
 
@@ -377,7 +366,7 @@ If you want `super()` method support, use {{#crossLink "decal.Class"}}{{/crossLi
 
 ```javascript
 
-let Animal = $b.Class.extend({
+let Animal = decal.Class.extend({
 
     numLegs : 4,
 

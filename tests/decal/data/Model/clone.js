@@ -1,96 +1,77 @@
 describe('clone', function () {
+  it('should properly clone records.', function () {
+    let Model = decal.Model.extend({
+      a: decal.attr(),
+      b: decal.attr()
+    })
 
-    it('should properly clone records.', function () {
+    let json = [
+      {a: '1', b: '2'},
+      {a: '2', b: '3'}
+    ]
 
-        var Model,
-            json,
-            deserialized,
-            instance1,
-            instance2,
-            instance3,
-            instance4;
+    let instance1 = Model.create()
+    let instance2 = Model.create()
 
-        Model = decal.Model.extend({
-            a : decal.attr(),
-            b : decal.attr()
-        });
+    instance1.deserialize(json[0])
+    instance2.deserialize(json[1])
 
-        json = [
-            {a : '1', b : '2'},
-            {a : '2', b : '3'}
-        ];
+    let instance3 = instance1.clone()
+    let instance4 = instance2.clone()
 
-        instance1 = Model.create();
-        instance2 = Model.create();
+    expect(instance1.a).to.equal('1')
+    expect(instance1.b).to.equal('2')
 
-        instance1.deserialize(json[0]);
-        instance2.deserialize(json[1]);
+    expect(instance2.a).to.equal('2')
+    expect(instance2.b).to.equal('3')
 
-        instance3 = instance1.clone();
-        instance4 = instance2.clone();
+    expect(instance3.a).to.equal('1')
+    expect(instance3.b).to.equal('2')
 
-        expect(instance1.a).to.equal('1');
-        expect(instance1.b).to.equal('2');
+    expect(instance4.a).to.equal('2')
+    expect(instance4.b).to.equal('3')
 
-        expect(instance2.a).to.equal('2');
-        expect(instance2.b).to.equal('3');
+    let deserialized = [
+      instance3.getProperties(['a', 'b']),
+      instance4.getProperties(['a', 'b'])
+    ]
 
-        expect(instance3.a).to.equal('1');
-        expect(instance3.b).to.equal('2');
+    expect(deserialized).to.deep.equal(json)
 
-        expect(instance4.a).to.equal('2');
-        expect(instance4.b).to.equal('3');
+    instance1.destroy()
+    instance2.destroy()
+    instance3.destroy()
+    instance4.destroy()
+  })
 
-        deserialized = [
-            instance3.getProperties(['a', 'b']),
-            instance4.getProperties(['a', 'b'])
-        ];
+  it('should not clone primary keys.', function () {
+    let Model = decal.Model.extend({
+      primaryKey: 'uuid'
+    })
 
-        expect(deserialized).to.deep.equal(json);
+    let json = [
+      {uuid: 1},
+      {uuid: 2}
+    ]
 
-        instance1.destroy();
-        instance2.destroy();
-        instance3.destroy();
-        instance4.destroy();
-    });
+    let instance1 = Model.create()
+    let instance2 = Model.create()
 
-    it('should not clone primary keys.', function () {
+    instance1.deserialize(json[0])
+    instance2.deserialize(json[1])
 
-        var Model,
-            json,
-            deserialized,
-            instance1,
-            instance2,
-            instance3,
-            instance4;
+    let instance3 = instance1.clone()
+    let instance4 = instance2.clone()
 
-        Model = decal.Model.extend({
-            primaryKey : 'uuid'
-        });
+    expect(instance1.pk).to.equal(1)
+    expect(instance2.pk).to.equal(2)
 
-        json = [
-            {uuid : 1},
-            {uuid : 2}
-        ];
+    expect(instance3.pk).to.equal(undefined)
+    expect(instance4.pk).to.equal(undefined)
 
-        instance1 = Model.create();
-        instance2 = Model.create();
-
-        instance1.deserialize(json[0]);
-        instance2.deserialize(json[1]);
-
-        instance3 = instance1.clone();
-        instance4 = instance2.clone();
-
-        expect(instance1.pk).to.equal(1);
-        expect(instance2.pk).to.equal(2);
-
-        expect(instance3.pk).to.equal(undefined);
-        expect(instance4.pk).to.equal(undefined);
-
-        instance1.destroy();
-        instance2.destroy();
-        instance3.destroy();
-        instance4.destroy();
-    });
-});
+    instance1.destroy()
+    instance2.destroy()
+    instance3.destroy()
+    instance4.destroy()
+  })
+})

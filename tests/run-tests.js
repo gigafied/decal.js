@@ -1,57 +1,52 @@
-var p,
-    fs,
-    path,
-    chai,
-    mocha,
-    timeout;
+'use strict'
 
-global.decal = require('../src/index.js');
+const fs = require('fs')
+const path = require('path')
+const chai = require('chai')
+const Mocha = require('mocha')
 
-fs = require('fs');
-path = require('path');
-chai = require('chai'),
-mocha = require('mocha');
+let timeout = null
 
-mocha = new mocha({
-    ui : 'bdd',
-    reporter : 'spec'
-});
-mocha.checkLeaks();
-global.expect = chai.expect;
+global.decal = require('../src/index.js')
 
-var done = function (failures) {
-    process.exit(failures);
-};
+let mocha = new Mocha({
+  ui: 'bdd',
+  reporter: 'spec'
+})
+
+mocha.checkLeaks()
+global.expect = chai.expect
+
+function done (failures) {
+  process.exit(failures)
+}
 
 function addTests (folder, p) {
+  fs.readdirSync(folder).filter(function (file) {
+    p = path.join(folder, file)
 
-    fs.readdirSync(folder).filter(function (file) {
+    if (fs.statSync(p).isDirectory()) {
+      addTests(p)
+      return
+    }
 
-        p = path.join(folder, file);
-
-        if (fs.statSync(p).isDirectory()) {
-            addTests(p);
-            return;
-        }
-
-        if (file === 'index.js') {
-            mocha.addFile(p);
-        }
-    });
+    if (file === 'index.js') {
+      mocha.addFile(p)
+    }
+  })
 }
 
 module.exports = function (cb) {
+  if (timeout) {
+    clearTimeout(timeout)
+    timeout = null
+  }
 
-    if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-    }
+  mocha.run(cb)
+}
 
-    mocha.run(cb);
-};
-
-addTests(path.join(__dirname, 'decal'));
+addTests(path.join(__dirname, 'decal'))
 
 timeout = setTimeout(function () {
-    mocha.run(done);
-}, 0);
+  mocha.run(done)
+}, 0)

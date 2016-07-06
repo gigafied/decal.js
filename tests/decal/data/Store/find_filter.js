@@ -1,225 +1,153 @@
 describe('find + filter', function () {
+  it('should return all records with all().', function () {
+    let Model = decal.Model.extend({
+      modelKey: 'test',
+      idx: decal.attr()
+    })
 
-    it('should return all records with all().', function () {
+    let instances = []
 
-        var i,
-            Model,
-            store,
-            record,
-            instances;
+    for (let i = 0; i < 10; i++) instances.push(Model.create({idx: i}))
 
-        Model = decal.Model.extend({
-            modelKey : 'test',
-            idx : decal.attr()
-        });
+    let store = decal.Store.create()
+    store.add('test', instances)
 
-        instances = [];
+    expect(store.all('test').toArray()).to.deep.equal(instances)
 
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({idx : i}));
-        }
+    store.destroy(true)
+  })
 
-        store = decal.Store.create();
-        store.add('test', instances);
+  it('should clear all records with clear().', function () {
+    let Model = decal.Model.extend({
+      modelKey: 'test',
+      idx: decal.attr()
+    })
 
-        expect(store.all('test').toArray()).to.deep.equal(instances);
+    let instances = []
 
-        store.destroy(true);
-    });
+    for (let i = 0; i < 10; i++) {
+      instances.push(Model.create({idx: i}))
+    }
 
-    it('should clear all records with clear().', function () {
+    let store = decal.Store.create()
+    store.add('test', instances)
 
-        var i,
-            Model,
-            store,
-            record,
-            instances;
+    expect(store.all('test').toArray()).to.deep.equal(instances)
 
-        Model = decal.Model.extend({
-            modelKey : 'test',
-            idx : decal.attr()
-        });
+    store.clear()
+    expect(store.all('test').toArray()).to.deep.equal([])
 
-        instances = [];
+    store.destroy(true)
+  })
 
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({idx : i}));
-        }
+  it('should properly find records.', function () {
+    let Model = decal.Model.extend({
+      modelKey: 'test',
+      idx: decal.attr()
+    })
 
-        store = decal.Store.create();
-        store.add('test', instances);
+    let instances = []
 
-        expect(store.all('test').toArray()).to.deep.equal(instances);
+    for (let i = 0; i < 10; i++) instances.push(Model.create({idx: i}))
 
-        store.clear();
-        expect(store.all('test').toArray()).to.deep.equal([]);
+    let store = decal.Store.create()
+    store.add('test', instances)
 
-        store.destroy(true);
-    });
+    let record = store.find('test', {idx: 5})
+    expect(record).to.equal(instances[5])
+    store.destroy(true)
+  })
 
-    it('should properly find records.', function () {
+  it('should properly find records by primary key.', function () {
+    let Model = decal.Model.extend({
+      modelKey: 'test'
+    })
 
-        var i,
-            Model,
-            store,
-            record,
-            instances;
+    let instances = []
 
-        Model = decal.Model.extend({
-            modelKey : 'test',
-            idx : decal.attr()
-        });
+    for (let i = 0; i < 10; i++) instances.push(Model.create({id: i}))
 
-        instances = [];
+    let store = decal.Store.create()
+    store.add('test', instances)
 
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({idx : i}));
-        }
+    let record = store.find('test', 3)
+    expect(record).to.equal(instances[3])
+    store.destroy(true)
+  })
 
-        store = decal.Store.create();
-        store.add('test', instances);
+  it('should properly find records with a function.', function (done) {
+    let Model = decal.Model.extend({
+      modelKey: 'test',
+      idx: decal.attr()
+    })
 
-        record = store.find('test', {idx : 5});
+    let instances = []
 
-        expect(record).to.equal(instances[5]);
+    for (let i = 0; i < 10; i++) instances.push(Model.create({idx: i}))
 
-        store.destroy(true);
-    });
+    let store = decal.Store.create()
+    store.add('test', instances)
 
-    it('should properly find records by primary key.', function () {
+    let record = store.find('test', function (item) {
+      return item.get('idx') === 4
+    })
 
-        var i,
-            Model,
-            store,
-            record,
-            instances;
+    expect(record).to.equal(instances[4])
+    store.destroy(true)
+    done()
+  })
 
-        Model = decal.Model.extend({
-            modelKey : 'test'
-        });
+  it('should properly filter records.', function (done) {
+    let Model = decal.Model.extend({
+      modelKey: 'test',
+      idx: decal.attr(),
+      hidden: decal.attr()
+    })
 
-        instances = [];
+    let instances = []
 
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({id : i}));
-        }
+    for (let i = 0; i < 10; i++) instances.push(Model.create({idx: i, hidden: i < 5}))
 
-        store = decal.Store.create();
-        store.add('test', instances);
+    let store = decal.Store.create()
+    store.add('test', instances)
 
-        record = store.find('test', 3);
+    let records = store.filter('test', {hidden: false})
 
-        expect(record).to.equal(instances[3]);
+    expect(records.length).to.equal(5)
+    expect(records[0]).to.equal(instances[5])
+    expect(records[1]).to.equal(instances[6])
+    expect(records[2]).to.equal(instances[7])
+    expect(records[3]).to.equal(instances[8])
+    expect(records[4]).to.equal(instances[9])
 
-        store.destroy(true);
-    });
+    store.destroy(true)
+    done()
+  })
 
-    it('should properly find records with a function.', function (done) {
+  it('should properly filter records with a function.', function () {
+    let Model = decal.Model.extend({
+      modelKey: 'test',
+      idx: decal.attr(),
+      hidden: decal.attr()
+    })
 
-        var i,
-            Model,
-            store,
-            record,
-            instances;
+    let instances = []
 
-        Model = decal.Model.extend({
-            modelKey : 'test',
-            idx : decal.attr()
-        });
+    for (let i = 0; i < 10; i++) instances.push(Model.create({idx: i, hidden: i < 5}))
 
-        instances = [];
+    let store = decal.Store.create()
+    store.add('test', instances)
 
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({idx : i}));
-        }
+    let records = store.filter('test', item => item.get('hidden') === true)
 
-        store = decal.Store.create();
-        store.add('test', instances);
+    expect(records.length).to.equal(5)
 
-        record = store.find('test', function (item) {
-            return item.get('idx') === 4;
-        });
+    expect(records[0]).to.equal(instances[0])
+    expect(records[1]).to.equal(instances[1])
+    expect(records[2]).to.equal(instances[2])
+    expect(records[3]).to.equal(instances[3])
+    expect(records[4]).to.equal(instances[4])
 
-        expect(record).to.equal(instances[4]);
-
-        store.destroy(true);
-
-        done();
-    });
-
-    it('should properly filter records.', function (done) {
-
-        var i,
-            Model,
-            store,
-            records,
-            instances;
-
-        Model = decal.Model.extend({
-            modelKey : 'test',
-            idx : decal.attr(),
-            hidden : decal.attr()
-        });
-
-        instances = [];
-
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({idx : i, hidden : i < 5}));
-        }
-
-        store = decal.Store.create();
-        store.add('test', instances);
-
-        records = store.filter('test', {hidden : false});
-
-        expect(records.length).to.equal(5);
-
-        expect(records[0]).to.equal(instances[5]);
-        expect(records[1]).to.equal(instances[6]);
-        expect(records[2]).to.equal(instances[7]);
-        expect(records[3]).to.equal(instances[8]);
-        expect(records[4]).to.equal(instances[9]);
-
-        store.destroy(true);
-
-        done();
-    });
-
-    it('should properly filter records with a function.', function () {
-
-        var i,
-            Model,
-            store,
-            records,
-            instances;
-
-        Model = decal.Model.extend({
-            modelKey : 'test',
-            idx : decal.attr(),
-            hidden : decal.attr()
-        });
-
-        instances = [];
-
-        for (i = 0; i < 10; i ++) {
-            instances.push(Model.create({idx : i, hidden : i < 5}));
-        }
-
-        store = decal.Store.create();
-        store.add('test', instances);
-
-        records = store.filter('test', function (item) {
-            return item.get('hidden') === true;
-        });
-
-        expect(records.length).to.equal(5);
-
-        expect(records[0]).to.equal(instances[0]);
-        expect(records[1]).to.equal(instances[1]);
-        expect(records[2]).to.equal(instances[2]);
-        expect(records[3]).to.equal(instances[3]);
-        expect(records[4]).to.equal(instances[4]);
-
-        store.destroy(true);
-    });
-});
+    store.destroy(true)
+  })
+})

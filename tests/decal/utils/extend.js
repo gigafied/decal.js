@@ -1,89 +1,67 @@
 describe('extend', function () {
+  it('should properly shallow extend objects.', function () {
+    let c = {c: 'test'}
+    let a = {b: c}
 
-    it('should properly shallow extend objects.', function () {
+    let test = {a}
 
-        var c,
-            a,
-            test,
-            test2;
+    let test2 = decal.extend({}, test)
 
-        c = {c : 'test'};
-        a = {b : c};
+    expect(test2).to.not.equal(test)
+    expect(test2.a).to.equal(a)
+    expect(test2.a.b).to.equal(c)
 
-        test = {
-            a : a
-        };
+    expect(test2).to.deep.equal(test)
+    expect(test2.a).to.deep.equal(a)
+    expect(test2.a.b).to.deep.equal(c)
+  })
 
-        test2 = decal.extend({}, test);
+  it('should properly deep extend objects.', function () {
+    let c = {c: 'test'}
+    let a = {b: c}
 
-        expect(test2).to.not.equal(test);
-        expect(test2.a).to.equal(a);
-        expect(test2.a.b).to.equal(c);
+    let test = {
+      a: a
+    }
 
-        expect(test2).to.deep.equal(test);
-        expect(test2.a).to.deep.equal(a);
-        expect(test2.a.b).to.deep.equal(c);
-    });
+    let test2 = decal.extend('', true, test)
 
-    it('should properly deep extend objects.', function () {
+    expect(test2).to.not.equal(test)
+    expect(test2.a).to.not.equal(a)
+    expect(test2.a.b).to.not.equal(c)
 
-        var c,
-            a,
-            test,
-            test2;
+    expect(test2).to.deep.equal(test)
+    expect(test2.a).to.deep.equal(a)
+    expect(test2.a.b).to.deep.equal(c)
+  })
 
-        c = {c : 'test'};
-        a = {b : c};
+  it('should properly deep extend arrays.', function () {
+    let c = {c: 'test'}
+    let a = {b: c}
 
-        test = {
-            a : a
-        };
+    let test = [
+      {a: a},
+      {a: a},
+      {a: a},
+      [
+        {a: a},
+        {a: a}
+      ]
+    ]
 
-        test2 = decal.extend('', true, test);
+    let test2 = decal.extend([], true, test)
 
-        expect(test2).to.not.equal(test);
-        expect(test2.a).to.not.equal(a);
-        expect(test2.a.b).to.not.equal(c);
+    expect(test2).to.not.equal(test)
+    expect(test2[0].a).to.not.equal(a)
+    expect(test2[1].a.b).to.not.equal(c)
+    expect(test2[0]).to.not.equal(test2[1])
+    expect(test2[3][0]).to.not.equal(test2[3][1])
 
-        expect(test2).to.deep.equal(test);
-        expect(test2.a).to.deep.equal(a);
-        expect(test2.a.b).to.deep.equal(c);
-    });
+    expect(test2).to.deep.equal(test)
+    expect(test2[0].a).to.deep.equal(a)
+    expect(test2[1].a.b).to.deep.equal(c)
+    expect(test2[0]).to.deep.equal(test2[1])
 
-    it('should properly deep extend arrays.', function () {
-
-        var c,
-            a,
-            test,
-            test2;
-
-        c = {c : 'test'};
-        a = {b : c};
-
-        test = [
-            {a : a},
-            {a : a},
-            {a : a},
-            [
-                {a : a},
-                {a : a}
-            ]
-        ];
-
-        test2 = decal.extend([], true, test);
-
-        expect(test2).to.not.equal(test);
-        expect(test2[0].a).to.not.equal(a);
-        expect(test2[1].a.b).to.not.equal(c);
-        expect(test2[0]).to.not.equal(test2[1]);
-        expect(test2[3][0]).to.not.equal(test2[3][1]);
-
-        expect(test2).to.deep.equal(test);
-        expect(test2[0].a).to.deep.equal(a);
-        expect(test2[1].a.b).to.deep.equal(c);
-        expect(test2[0]).to.deep.equal(test2[1]);
-
-        expect(test2[3][0]).to.deep.equal(test[0]);
-
-    });
-});
+    expect(test2[3][0]).to.deep.equal(test[0])
+  })
+})

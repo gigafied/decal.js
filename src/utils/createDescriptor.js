@@ -1,38 +1,30 @@
-/***********************************************************************
+/**
 @class decal
-************************************************************************/
+
+Used by `decal.Object.prototype.prop()` for property descriptors.
+
+@method defineProperty
+@private
+*/
 
 'use strict'
 
-const assert = require('./assert');
 const isFunction = require('./isFunction')
 
 function defineGetter (obj, p, fn) {
   if (isFunction(fn)) obj.__meta.getters[p] = fn
 
-  return function () {
-    return this.get(p);
-  }
+  return function () { return this.get(p) }
 }
 
 function defineSetter (obj, p, fn) {
   if (isFunction(fn)) obj.__meta.setters[p] = fn
 
-  return function (val) {
-    return this.set(p, val);
-  }
+  return function (val) { return this.set(p, val) }
 }
-/***********************************************************************
-Used by `decal.Object.prototype.prop()` for property descriptors.
-
-@method defineProperty
-@private
-************************************************************************/
 
 module.exports = function (obj, prop, descriptor) {
-  var d
-
-  d = descriptor
+  let d = descriptor
 
   if (d.__meta && (d.__meta.isAttribute || d.__meta.isRelationship)) {
     d = d.clone()
@@ -50,8 +42,8 @@ module.exports = function (obj, prop, descriptor) {
   d.set = defineSetter(obj, prop, descriptor.set)
 
   d.defaultValue = (
-    typeof descriptor.defaultValue !== 'undefined' ?
-      descriptor.defaultValue : descriptor.value
+    typeof descriptor.defaultValue !== 'undefined'
+    ? descriptor.defaultValue : descriptor.value
   )
 
   delete d.value

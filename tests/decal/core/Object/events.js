@@ -1,62 +1,29 @@
 describe('events', function () {
+  it('should be able to listen for events with on()', function () {
+    let a = decal.Object.create({})
+    let count = 0
 
-    it('should be able to listen for events with on()', function () {
+    a.on('test', e => count++)
+    a.emit('test')
+    a.emit('test')
 
-        var a,
-            count = 0;
+    expect(count).to.equal(2)
+    a.destroy()
+  })
 
-        a = decal.Object.create({});
+  it('should be able to unlisten for events with off()', function () {
+    let a = decal.Object.create({})
+    let count = 0
 
-        a.on('test', function (e) {
-            count ++;
-        });
+    function fn (e) { count++ }
 
-        a.emit('test');
-        a.emit('test');
+    a.on('test', fn)
+    a.off('test', fn)
 
-        expect(count).to.equal(2);
-        a.destroy();
-    });
+    a.emit('test')
+    a.emit('test')
 
-    it('should be able to unlisten for events with off()', function () {
-
-        var a,
-            fn,
-            count = 0;
-
-        a = decal.Object.create({});
-
-        fn = function (e) {count ++;};
-
-        a.on('test', fn);
-        a.off('test', fn);
-
-        a.emit('test');
-        a.emit('test');
-
-        expect(count).to.equal(0);
-        a.destroy();
-    });
-
-
-    it('should be able to listen for events only one time with once()', function () {
-
-        var a,
-            count = 0;
-
-        a = decal.Object.create({});
-
-        a.once('test', function (e) {
-            if (++count === 2) {
-                a.destroy();
-                done();
-            }
-        });
-
-        a.emit('test');
-        a.emit('test');
-
-        expect(count).to.equal(1);
-        a.destroy();
-    });
-});
+    expect(count).to.equal(0)
+    a.destroy()
+  })
+})

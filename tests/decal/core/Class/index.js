@@ -1,5 +1,4 @@
 describe('decal.Class', function () {
-    require('./construction');
-    require('./destruction');
-});
-
+  require('./construction')
+  require('./destruction')
+})

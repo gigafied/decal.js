@@ -1,15 +1,9 @@
 describe('utils', function () {
+  before(function () {})
 
-    before(function () {
+  require('./extend')
+  require('./expandProps')
+  require('./trim')
 
-    });
-
-    require('./extend');
-    require('./expandProps');
-    require('./trim');
-
-    after(function () {
-
-    });
-});
-
+  after(function () {})
+})

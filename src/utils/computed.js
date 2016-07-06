@@ -1,12 +1,6 @@
-/***********************************************************************
+/**
 @class decal
-************************************************************************/
 
-'use strict'
-
-const isFunction = require('./isFunction')
-
-/***********************************************************************
 Create a computed property on a {{#crossLink "decal.Object"}}{{/crossLink}}
 instance or subclass.
 
@@ -15,10 +9,10 @@ There are two ways to define computed properties, both methods are given below.
 **METHOD 1:**
 ```javascript
 
-var Person = $b.Object.extend({
+let Person = decal.Object.extend({
     firstName : '',
     lastLame : '',
-    fullName : $b.computed(function () {
+    fullName : decal.computed(function () {
         return this.firstName + ' ' + this.lastName
     }, 'firstName', 'lastName')
 })
@@ -32,10 +26,10 @@ console.log(personInstance.fullName); // 'Jane Smith'
 ```
 **METHOD 2:**
 ```javascript
-var personInstance = $b.Object.create({
+let personInstance = decal.Object.create({
     firstName : 'Jane',
     lastName : 'Smith',
-    fullName : $b.computed({
+    fullName : decal.computed({
 
         watch : ['firstName', 'lastName'],
 
@@ -72,7 +66,11 @@ empty array for the `watch` property or not define it at all.
 @param {Function} fn The getter for the computed property.
 @param {String} ...watch The properties to watch.
 @return {ComputedProperty}
-************************************************************************/
+*/
+
+'use strict'
+
+const isFunction = require('./isFunction')
 
 module.exports = function (o) {
   if (isFunction(o)) {
@@ -91,16 +89,11 @@ module.exports = function (o) {
   o.__isComputed = true
 
   o.meta = function (m) {
-    var p
-
     if (typeof m !== 'undefined') {
-      for (p in m) {
-        o.__meta[p] = m[p]
-      }
+      for (let p in m) o.__meta[p] = m[p]
     }
-
     return o.__meta
-  }.bind(o)
+  }
 
   return o
 }

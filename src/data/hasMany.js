@@ -1,3 +1,12 @@
+/**
+Define a hasMany relationship (one to many).
+
+@method hasMany
+@param  {String} modelKey The modelKey of the relationship.
+@param  {Object} opts Options for the relationship.
+@return {ComputedProperty}
+*/
+
 'use strict'
 
 const get = require('../utils/get')
@@ -6,22 +15,10 @@ const assert = require('../utils/assert')
 const computed = require('../utils/computed')
 const Collection = require('./Collection')
 
-/***********************************************************************
-Define a hasMany relationship (one to many).
-
-@method hasMany
-@param  {String} modelKey The modelKey of the relationship.
-@param  {Object} opts Options for the relationship.
-@return {ComputedProperty}
-************************************************************************/
-
-module.exports = function make(mKey, opts) {
-
+module.exports = function make (mKey, opts) {
   opts = opts || {}
 
-  if (opts.map) {
-    opts.embedded = true
-  }
+  if (opts.map) opts.embedded = true
 
   let hasMany = computed({
 
@@ -31,22 +28,20 @@ module.exports = function make(mKey, opts) {
     },
 
     set (val, key) {
-
       let meta = this.__meta
-      let store = this.store
       let dirty = get(this, 'dirtyAttributes')
       let data = meta.data
       let pristine = meta.pristineData
 
       if (dirty) {
         if (typeof pristine[key] !== 'undefined') {
-          dirtyIdx = dirty.indexOf(key)
+          let dirtyIdx = dirty.indexOf(key)
           if (pristine[key] === val && ~dirtyIdx) dirty.removeAt(dirtyIdx)
           else if (!~dirtyIdx) dirty.push(key)
         }
       } else {
-          pristine[key] = typeof data[key] !== 'undefined' ? data[key] : opts.defaultValue
-          dirty.push(key)
+        pristine[key] = typeof data[key] !== 'undefined' ? data[key] : opts.defaultValue
+        dirty.push(key)
       }
 
       if (val) assert('Must be a Collection.', val instanceof Collection)
@@ -56,14 +51,12 @@ module.exports = function make(mKey, opts) {
   })
 
   hasMany.meta({
-
     type: 'hasMany',
     isRelationship: true,
     opts: opts,
     relationshipKey: mKey,
 
     serialize (filter, dirty) {
-
       let meta = hasMany.meta()
       let key = meta.key
       let map = opts.map || {}
@@ -73,11 +66,9 @@ module.exports = function make(mKey, opts) {
       if (val) val = val.serialize(opts.embedded, filter, dirty)
 
       if (val && opts.map) {
-
         let val2 = {}
 
         for (let i = 0; i < val.length; i++) {
-
           if (map.value) val2[val[i][map.key]] = val[i][map.value]
           else {
             val2[val[i][map.key]] = val[i]
@@ -96,7 +87,6 @@ module.exports = function make(mKey, opts) {
     },
 
     deserialize (val, override, filter) {
-
       let meta = hasMany.meta()
       let key = meta.key
       let map = opts.map || {}
@@ -108,7 +98,6 @@ module.exports = function make(mKey, opts) {
         let val2 = []
 
         for (let i in val) {
-
           let obj, obj2
 
           if (val[i] && !Array.isArray(val[i]) && typeof val[i] === 'object') obj = val[i]
@@ -129,15 +118,13 @@ module.exports = function make(mKey, opts) {
       let collection = get(this, key) || Collection.create()
 
       for (let i = 0; i < val.length; i++) {
-
         if (val && val[i]) {
           let record
           if (opts.embedded && typeof val[i] === 'object') {
             record = store.modelFor(mKey).create()
             store.add(mKey, record)
             record.deserialize(val[i], override, filter)
-          }
-          else record = store.findOrCreate(mKey, val[i])
+          } else record = store.findOrCreate(mKey, val[i])
           records.push(record)
         }
       }
@@ -149,7 +136,6 @@ module.exports = function make(mKey, opts) {
     },
 
     revert (revertRelationships) {
-
       let meta = hasMany.meta()
       let key = meta.key
       let pristine = this.__meta.pristineData
@@ -160,11 +146,7 @@ module.exports = function make(mKey, opts) {
           pristine[key] = undefined
           val.revertAll(revertRelationships)
         }
-      }
-
-      else if (pristine[key]) {
-        set(this, key, pristine[key])
-      }
+      } else if (pristine[key]) set(this, key, pristine[key])
     }
   })
 

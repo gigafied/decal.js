@@ -1,25 +1,16 @@
-/***********************************************************************
+/**
 @class decal
-************************************************************************/
 
-'use strict'
-
-const get = require('./get')
-const error = require('./error')
-const getObjKeyPair = require('./getObjKeyPair')
-const CoreObject = require('../core/CoreObject')
-
-/***********************************************************************
 Set property/properties or a nested property on an `Object`. Works on POJOs as well
 as `decal.Object` instances.
 
 **Setting single properties:**
 
 ```javascript
-var obj = {}
+let obj = {}
 
-$b.set(obj, 'test', 'test')
-$b.set(obj, 'some.nested.key', 'test2')
+decal.set(obj, 'test', 'test')
+decal.set(obj, 'some.nested.key', 'test2')
 
 console.log(obj); // { test: 'test', some: { nested: { key: 'test2' } } }
 
@@ -28,9 +19,9 @@ console.log(obj); // { test: 'test', some: { nested: { key: 'test2' } } }
 **Setting multiple properties:**
 
 ```javascript
-var obj = {}
+let obj = {}
 
-$b.set(obj, {test : 'test', test2 : 'test2'})
+decal.set(obj, {test : 'test', test2 : 'test2'})
 
 console.log(obj); // { test: 'test', test2: 'test2' }
 
@@ -42,7 +33,14 @@ console.log(obj); // { test: 'test', test2: 'test2' }
 If setting multiple properties, an `Object` containing key : value pairs.
 @param {Any} [val] The value of the property.
 @return {Object} The Object passed in as the first argument.
-************************************************************************/
+*/
+
+'use strict'
+
+const get = require('./get')
+const error = require('./error')
+const getObjKeyPair = require('./getObjKeyPair')
+const CoreObject = require('../core/CoreObject')
 
 function set (obj, key, val, quiet, skipCompare) {
   let meta
@@ -63,9 +61,7 @@ function set (obj, key, val, quiet, skipCompare) {
     } else obj[key] = val
 
     return obj
-  }
-
-  else if (arguments.length === 2) {
+  } else if (arguments.length === 2) {
     for (let i in key) set(obj, i, key[i], val, quiet)
     return obj
   }

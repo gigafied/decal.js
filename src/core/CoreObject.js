@@ -1,17 +1,16 @@
 'use strict'
 
-const merge = require('../utils/merge')
 const extend = require('../utils/extend')
 const EventEmitter = require('events')
 
-/***********************************************************************
+/**
 
 `decal.CoreObject` is not meant to be used directly.
 Instead, use {{#crossLink "decal.Object"}}{{/crossLink}} or {{#crossLink "decal.Class"}}{{/crossLink}}.
 
 @class decal.CoreObject
 @constructor
-************************************************************************/
+*/
 
 class CoreObject extends EventEmitter {
 
@@ -25,18 +24,17 @@ class CoreObject extends EventEmitter {
 }
 
 CoreObject.extend = function (...args) {
-
   if (arguments.length > 1) {
     let C = this
-    for (let i = 0, l = args.length - 1; i < l; i ++) C = C.extend(args[i])
+    for (let i = 0, l = args.length - 1; i < l; i++) C = C.extend(args[i])
     return C
   }
 
   let props = args[0]
-  let proto = this.buildPrototype.call(this, props)
+  let proto = this.buildPrototype(props)
 
   function DecalObject (__decal__) {
-    if (__decal__ !== '__decal__') throw new Error('Use Obj.create() to instantiate, not new Obj()');
+    if (__decal__ !== '__decal__') throw new Error('Use Obj.create() to instantiate, not new Obj()')
     return this
   }
 

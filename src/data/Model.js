@@ -1,4 +1,4 @@
-/***********************************************************************
+/**
 
 decal's Model, Store and Adapter Classes offers you flexible and easy way to work with your data layer.
 
@@ -7,41 +7,41 @@ structures.
 
 ```javascript
 
-var MyStore = $b.Store.create()
+let MyStore = decal.Store.create()
 
-var Person = $b.Model.extend({
+let Person = decal.Model.extend({
 
   primaryKey: 'id',
   modelKey: 'person',
 
-  adapter: $b.RESTAdapter.create(),
+  adapter: decal.RESTAdapter.create(),
   store: MyStore,
 
-  schema: $b.Schema.create({
-    firstName: $b.attr(String),
-    lastName: $b.attr(String),
+  schema: decal.Schema.create({
+    firstName: decal.attr(String),
+    lastName: decal.attr(String),
 
-    children: $b.hasMany('person'),
-    spouse: $b.belongsTo('person')
+    children: decal.hasMany('person'),
+    spouse: decal.belongsTo('person')
   })
 })
 
-var dad = Person.create({
+let dad = Person.create({
   firstName: 'John',
   lastName: 'Doe'
 })
 
-var mom = Person.create({
+let mom = Person.create({
   firstName: 'Jane',
   lastName: 'Doe'
 })
 
-var child1 = Person.create({
+let child1 = Person.create({
   firstName: 'Mary',
   lastName: 'Doe'
 })
 
-var child2 = Person.create({
+let child2 = Person.create({
   firstName: 'Bob',
   lastName: 'Doe'
 })
@@ -49,7 +49,7 @@ var child2 = Person.create({
 dad.spouse = mom
 dad.children.push(child1, child2)
 
-$b.Q.all([
+decal.Q.all([
   mom.save(),
   child1.save(),
   child2.save()
@@ -68,17 +68,18 @@ record they would come back with null primary key values.
 @module decal
 @submodule data
 
-************************************************************************/
+*/
 
 const get = require('../utils/get')
 const set = require('../utils/set')
+const assert = require('../utils/assert')
 const computed = require('../utils/computed')
 const Class = require('../core/Class')
 const DecalArray = require('../core/Array')
 
 let Model = Class.extend({
 
-  /***********************************************************************
+  /**
 
   The Model Class is what all records are created from. Models provide
   a uniform way to work with your records no matter what your backend
@@ -89,29 +90,29 @@ let Model = Class.extend({
 
   @class decal.Model
   @constructor
-  ************************************************************************/
+  */
 
-  /***********************************************************************
+  /**
   The Store instance this model uses. This will only be defined if you
   have called addModel on a Store.
 
   @property store
   @type decal.Store
   @default null
-  ************************************************************************/
+  */
 
-  /***********************************************************************
+  /**
   The Adapter assigned to this model.
 
   @property adapter
   @type decal.Adapter
   @default null
-  ************************************************************************/
+  */
   adapter: computed(function () {
     return this.store.getAdapterFor(this.constructor)
   }, 'store'),
 
-  /***********************************************************************
+  /**
   The modelKey you want to use for the model. This will likely influence your adapter.
   i.e. for a RESTAdapter your modelKey would be used in the url for all requests
   made for instances of this model. For a MongooseAdapter,
@@ -120,11 +121,11 @@ let Model = Class.extend({
   @property modelKey
   @type String
   @default null
-  ************************************************************************/
+  */
 
   modelKey: null,
 
-  /***********************************************************************
+  /**
   The collectionKey you want to use for the model. Much like modelKey this is the
   pluralized form of modelKey. This will be auto-defined as your modelKey + 's' unless
   you explicity define it.
@@ -132,109 +133,109 @@ let Model = Class.extend({
   @property collectionKey
   @type String
   @default null
-  ************************************************************************/
+  */
 
-  /***********************************************************************
+  /**
   The property name of the primaryKey you are using for this Model.
 
   @property primaryKey
   @type String
   @default 'id'
-  ************************************************************************/
+  */
   primaryKey: 'id',
 
-  /***********************************************************************
+  /**
   A decal.Array of all the property names that have been changed since the
   last save() or fetch().
 
   @property dirtyAttributes
   @type decal.Array
   @default null
-  ************************************************************************/
+  */
   dirtyAttributes: null,
 
-  /***********************************************************************
+  /**
   Whether or not the record is currently saving.
 
   @property isSaving
   @type Boolean
   @default false
-  ************************************************************************/
+  */
 
   isSaving: false,
 
-  /***********************************************************************
+  /**
   Whether or not the record is currently being fetched.
 
   @property isFetching
   @type Boolean
   @default false
-  ************************************************************************/
+  */
 
   isFetching: false,
 
-  /***********************************************************************
+  /**
   Whether or not the record has been fetched/loaded.
 
   @property isLoaded
   @type Boolean
   @default false
-  ************************************************************************/
+  */
   isLoaded: false,
 
-  /***********************************************************************
+  /**
   Whether or not the record is currently being deleted.
 
   @property isDeleting
   @type Boolean
   @default false
-  ************************************************************************/
+  */
 
   isDeleting: false,
 
-  /***********************************************************************
+  /**
   Whether or not the record has one or more changed properties since the
   last save() or fetch().
 
   @property isDirty
   @type Boolean
   @default false
-  ************************************************************************/
+  */
 
   isDirty: computed(function () {
     return !!get(this, 'dirtyAttributes.length')
   }, 'dirtyAttributes.length'),
 
-  /***********************************************************************
+  /**
   Opposite of isDirty.
 
   @property isClean
   @type Boolean
   @default true
-  ************************************************************************/
+  */
 
   isClean: computed(function () {
     return !get(this, 'isDirty')
   }, 'isDirty'),
 
-  /***********************************************************************
+  /**
   Is the record new? Determined by the existence of a primary key value.
 
   @property isNew
   @type Boolean
   @default false
-  ************************************************************************/
+  */
 
   isNew: computed(function () {
     return !get(this, 'pk')
   }, 'pk'),
 
-  /***********************************************************************
+  /**
   Get the primary key value of the record.
 
   @property pk
   @type String|Number
-  ************************************************************************/
+  */
   pk: computed({
 
     get () {
@@ -247,16 +248,9 @@ let Model = Class.extend({
   }),
 
   __init (props) {
-
-    var p,
-      desc,
-      pMeta,
-      attributes,
-      relationships
-
-    this.__skipInit = true;
-    this._super.call(this)
-    delete this.___skipInit;
+    this.__skipInit = true
+    this._super()
+    delete this.___skipInit
 
     let meta = this.__meta
     meta.data = {}
@@ -268,28 +262,18 @@ let Model = Class.extend({
     if (cMeta.attributes) {
       meta.attributes = cMeta.attributes
       meta.relationships = cMeta.relationships
-    }
+    } else {
+      let attributes = []
+      let relationships = []
 
-    else {
-
-      attributes = []
-      relationships = []
-
-      for (p in meta.properties) {
-        desc = meta.properties[p]
-        pMeta = desc.meta && desc.meta()
-
+      for (let p in meta.properties) {
+        let desc = meta.properties[p]
+        let pMeta = desc.meta && desc.meta()
         if (pMeta) {
-          if (pMeta.isAttribute) {
-            attributes.push(p)
-          }
-
-          else if (pMeta.isRelationship) {
-            relationships.push(p)
-          }
+          if (pMeta.isAttribute) attributes.push(p)
+          else if (pMeta.isRelationship) relationships.push(p)
         }
       }
-
       meta.attributes = cMeta.attributes = attributes
       meta.relationships = cMeta.relationships = relationships
     }
@@ -304,117 +288,74 @@ let Model = Class.extend({
     return this
   },
 
-  /***********************************************************************
+  /**
   Serialize a record.
 
   @method serialize
   @param {Function} filter A custom function to filter out attributes as you see fit.
   @return {Object}
-  ************************************************************************/
+  */
 
   serialize (filter) {
+    let meta = this.__meta
+    let attributes = meta.attributes
+    let relationships = meta.relationships
+    let props = attributes.concat(relationships)
+    let json = {}
 
-    var i,
-      l,
-      p,
-      pk,
-      key,
-      val,
-      desc,
-      json,
-      meta,
-      pMeta,
-      props,
-      attributes,
-      relationships
+    for (let i = 0, l = props.length; i < l; i++) {
+      let p = props[i]
+      let desc = this.prop(p)
+      let pMeta = desc.meta()
+      let key = pMeta.opts.key || p
+      let val = pMeta.serialize.call(this, filter)
 
-    meta = this.__meta
-
-    attributes = meta.attributes
-    relationships = meta.relationships
-
-    props = attributes.concat(relationships)
-
-    json = {}
-
-    for (i = 0, l = props.length; i < l; i++) {
-      p = props[i]
-      desc = this.prop(p)
-      pMeta = desc.meta()
-      key = pMeta.opts.key || p
-
-      val = pMeta.serialize.call(this, filter)
-      if (typeof val !== 'undefined') {
-        set(json, key, val)
-      }
+      if (typeof val !== 'undefined') set(json, key, val)
     }
 
     if (this.primaryKey) {
-      pk = get(this, 'pk')
-      if (typeof pk !== 'undefined') {
-        set(json, this.primaryKey, pk)
-      }
+      let pk = get(this, 'pk')
+      if (typeof pk !== 'undefined') set(json, this.primaryKey, pk)
     }
 
     return json
   },
 
-  /***********************************************************************
+  /**
   Serialize the dirty attributes of a record.
 
   @method serializeDirty
   @param {Function} filter A custom function to filter out attributes as you see fit.
   @return {Object}
-  ************************************************************************/
+  */
 
   serializeDirty (filter) {
+    let meta = this.__meta
+    let attributes = meta.attributes
+    let relationships = meta.relationships
+    let props = attributes.concat(relationships)
+    let dirty = (get(this, 'dirtyAttributes') || []).concat()
+    let json = {}
 
-    var i,
-      l,
-      p,
-      pk,
-      key,
-      val,
-      desc,
-      json,
-      meta,
-      pMeta,
-      props,
-      dirty,
-      attributes,
-      relationships
-
-    meta = this.__meta
-
-    attributes = meta.attributes
-    relationships = meta.relationships
-
-    props = attributes.concat(relationships)
-    dirty = (get(this, 'dirtyAttributes') || []).concat()
-
-    json = {}
-
-    for (i = 0, l = props.length; i < l; i++) {
-      p = props[i]
-      desc = this.prop(p)
-      pMeta = desc.meta()
-      key = pMeta.opts.key || p
+    for (let i = 0, l = props.length; i < l; i++) {
+      let p = props[i]
+      let desc = this.prop(p)
+      let pMeta = desc.meta()
+      let key = pMeta.opts.key || p
 
       if (
         pMeta.isRelationship && pMeta.opts.embedded ||
         pMeta.isAttribute && ~dirty.indexOf(p)
       ) {
-        val = pMeta.serializeDirty.call(this, filter)
-        if (typeof val !== 'undefined') {
-          set(json, key, val)
-        }
+        let val = pMeta.serializeDirty.call(this, filter)
+        if (typeof val !== 'undefined') set(json, key, val)
       }
     }
 
     return json
   },
 
-  /***********************************************************************
+  /**
   De-serialize a record.
 
   @method deserialize
@@ -422,50 +363,32 @@ let Model = Class.extend({
   @param  {Boolean} override Whether or not you want to update properties that have already been dirtied.
   @param {Function} filter A custom function to filter out attributes as you see fit.
   @return {Model}
-  ************************************************************************/
+  */
 
   deserialize (json, override, filter) {
-
-    var i,
-      p,
-      di,
-      key,
-      val,
-      desc,
-      meta,
-      pMeta,
-      props,
-      dirty,
-      attributes,
-      relationships
-
-    meta = this.__meta
+    let meta = this.__meta
 
     if (!json) return this
 
-    dirty = (get(this, 'dirtyAttributes') || []).concat()
-    attributes = meta.attributes
-    relationships = meta.relationships
+    let dirty = (get(this, 'dirtyAttributes') || []).concat()
+    let attributes = meta.attributes
+    let relationships = meta.relationships
+    let props = attributes.concat(relationships)
+    let i = props.length
 
-    props = attributes.concat(relationships)
-
-    i = props.length
     while (i--) {
-      p = props[i]
-      desc = this.prop(p)
-      pMeta = desc.meta()
-
-      di = dirty.indexOf(p)
+      let p = props[i]
+      let desc = this.prop(p)
+      let pMeta = desc.meta()
+      let di = dirty.indexOf(p)
 
       if (~di) {
-        if (!override) {
-          continue
-        }
+        if (!override) continue
         dirty.splice(i, 1)
       }
 
-      key = pMeta.opts.key || p
-      val = get(json, key)
+      let key = pMeta.opts.key || p
+      let val = get(json, key)
 
       if (typeof val !== 'undefined' && (!filter || filter(pMeta, key, val))) {
         val = pMeta.deserialize.call(this, val, override, filter)
@@ -483,18 +406,17 @@ let Model = Class.extend({
     return this
   },
 
-  /***********************************************************************
+  /**
   Patches a record, recursively.
 
   @method patch
   @param  {Boolean} recursive Whather you want to undirty all embedded relationships as well.
   @return {Model}
-  ************************************************************************/
+  */
 
   patch (obj) {
-    function updateRecursively(obj2, context) {
-      var p
-      for (p in obj2) {
+    function updateRecursively (obj2, context) {
+      for (let p in obj2) {
         if (typeof obj2[p] === 'object') {
           updateRecursively(obj2[p], context[p])
           continue
@@ -506,79 +428,55 @@ let Model = Class.extend({
     return this
   },
 
-  /***********************************************************************
+  /**
   Marks all properties as clean.
 
   @method undirty
   @param  {Boolean} recursive Whather you want to undirty all embedded relationships as well.
   @return {Model}
-  ************************************************************************/
+  */
 
   undirty (recursive) {
-
-    var i,
-      p,
-      meta,
-      desc,
-      pMeta,
-      relationships
-
     set(this, 'dirtyAttributes', [])
+    if (!recursive) return
 
-    if (!recursive) {
-      return this
-    }
+    let meta = this.__meta
+    let relationships = meta.relationships
+    let i = relationships.length
 
-    meta = this.__meta
-    relationships = meta.relationships
-
-    i = relationships.length
     while (i--) {
-      p = relationships[i]
-      desc = this.prop(p)
-      pMeta = desc.meta()
-
-      if (pMeta.opts.embedded) {
-        get(this, p).undirty(true)
-      }
+      let p = relationships[i]
+      let desc = this.prop(p)
+      let pMeta = desc.meta()
+      if (pMeta.opts.embedded) get(this, p).undirty(true)
     }
 
     return this
   },
 
-  /***********************************************************************
+  /**
   Saves any changes to this record to the persistence layer (via the adapter).
   Also adds this record to the store.
 
   @method save
   @return {Promise}
-  ************************************************************************/
+  */
 
   save () {
-
-    var self,
-      dirty,
-      isNew
-
-    self = this
-    isNew = get(this, 'isNew')
-    dirty = isNew ? {} : this.serializeDirty()
-
+    let self = this
+    let isNew = get(this, 'isNew')
+    let dirty = isNew ? {} : this.serializeDirty()
     set(this, 'isSaving', true)
 
-    if (isNew && self.store) {
-      self.store.add(self)
-    }
+    if (isNew && self.store) self.store.add(self)
 
     return this.adapter.saveRecord(this).then(function (json) {
-
       self.emit('save', {
         isNew: isNew,
         updates: dirty
       })
 
       self.deserialize(json, true)
-
       self.undirty(true)
       set(self, 'isSaving', false)
       set(self, 'isLoaded', true)
@@ -586,124 +484,82 @@ let Model = Class.extend({
     })
   },
 
-  /***********************************************************************
+  /**
   Fetches and populates this record (via the adapter).
 
   @method fetch
   @return {Promise}
-  ************************************************************************/
+  */
 
   fetch (override) {
+    let self = this
+    let isNew = get(this, 'isNew')
 
-    var self,
-      isNew
-
-    self = this
-    isNew = get(this, 'isNew')
-
-    $b.assert('Can\'t fetch records without a primary key.', !isNew)
+    assert('Can\'t fetch records without a primary key.', !isNew)
 
     set(this, 'isFetching', true)
 
     return this.adapter.fetchRecord(this).then(function (json) {
-
       self.deserialize(json, !!override)
-
       self.emit('fetch')
-
-      if (!!override) {
-        self.undirty(true)
-      }
+      if (override) self.undirty(true)
       set(self, 'isFetching', false)
       set(self, 'isLoaded', true)
       return self
     })
   },
 
-  /***********************************************************************
+  /**
   Deletes this record (via the adapter). Also removes it from the store.
 
   @method delete
   @return {Promise}
-  ************************************************************************/
+  */
 
   delete () {
-
-    var self,
-      isNew
-
-    self = this
-    isNew = get(this, 'isNew')
-
+    let self = this
     set(this, 'isDeleting', true)
 
     return this.adapter.deleteRecord(this).then(function () {
-
       self.emit('deleted')
-
-      if (self.store) {
-        self.store.remove(self)
-      }
-
+      if (self.store) self.store.remove(self)
       self.destroy()
       return self
     })
   },
 
-  /***********************************************************************
+  /**
   Creates and returns a copy of this record, with a null primary key.
 
   @method clone
   @return {Model}
-  ************************************************************************/
+  */
 
   clone () {
-
-    var json = this.serialize()
-
-    if (typeof json[this.primaryKey] !== 'undefined') {
-      delete json[this.primaryKey]
-    }
-
+    let json = this.serialize()
+    if (typeof json[this.primaryKey] !== 'undefined') delete json[this.primaryKey]
     return this.constructor.create(json)
   },
 
-  /***********************************************************************
+  /**
   Reverts all changes made to this record since the last save() or fetch().
 
   @method revert
   @return {Model}
-  ************************************************************************/
+  */
 
   revert (revertRelationships) {
+    let meta = this.__meta
+    let attributes = meta.attributes
+    let relationships = meta.relationships
 
-    var i,
-      p,
-      key,
-      desc,
-      meta,
-      pMeta,
-      props,
-      dirty,
-      attributes,
-      relationships
+    let props = attributes.concat(relationships)
+    let i = props.length
 
-    meta = this.__meta
-
-    dirty = get(this, 'dirtyAttributes')
-    attributes = meta.attributes
-    relationships = meta.relationships
-
-    props = attributes.concat(relationships)
-
-    i = props.length
     while (i--) {
-      p = props[i]
-      desc = this.prop(p)
-      pMeta = desc.meta()
-
-      key = pMeta.opts.key || p
-
+      let p = props[i]
+      let desc = this.prop(p)
+      let pMeta = desc.meta()
       if (
         pMeta.isAttribute ||
         (pMeta.isRelationship &&
@@ -714,12 +570,11 @@ let Model = Class.extend({
     }
 
     this.emit('revert')
-
     return this
   },
 
   destroy () {
-    var i,
+    let i,
       p,
       key,
       val,
@@ -757,7 +612,6 @@ let Model = Class.extend({
 })
 
 Model.extend = function () {
-
   let SubClass = Class.extend.apply(this, arguments)
   let proto = SubClass.prototype
 
