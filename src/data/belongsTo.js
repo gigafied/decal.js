@@ -42,7 +42,7 @@ module.exports = function make (mKey, opts) {
       if (dirty) {
         if (typeof pristine[key] !== 'undefined') {
           let dirtyIdx = dirty.indexOf(key)
-          if (pristine[key] === val && ~dirtyIdx) dirty.removeAt(dirtyIdx)
+          if (pristine[key] === val && ~dirtyIdx) dirty.splice(dirtyIdx, 1)
           else if (!~dirtyIdx) dirty.push(key)
         }
       } else {
