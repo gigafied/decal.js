@@ -75,7 +75,6 @@ const set = require('../utils/set')
 const assert = require('../utils/assert')
 const computed = require('../utils/computed')
 const Class = require('../core/Class')
-const DecalArray = require('../core/Array')
 
 let Model = Class.extend({
 
@@ -145,11 +144,10 @@ let Model = Class.extend({
   primaryKey: 'id',
 
   /**
-  A decal.Array of all the property names that have been changed since the
-  last save() or fetch().
+  An Array of all the property names that have been changed since the last save() or fetch().
 
   @property dirtyAttributes
-  @type decal.Array
+  @type Array
   @default null
   */
   dirtyAttributes: null,
@@ -256,6 +254,8 @@ let Model = Class.extend({
     meta.data = {}
 
     let cMeta = this.constructor.__meta = this.constructor.__meta || {}
+    let dirty = []
+    set(this, 'dirtyAttributes', dirty)
 
     meta.isInitialized = false
 
@@ -281,7 +281,7 @@ let Model = Class.extend({
     meta.pristineData = {}
 
     if (typeof props === 'object') this.deserialize(props)
-    set(this, 'dirtyAttributes', DecalArray.create())
+    dirty.splice(0, dirty.length)
     meta.isInitialized = true
 
     if (this.init) this.init.apply(this, arguments)
@@ -370,7 +370,8 @@ let Model = Class.extend({
 
     if (!json) return this
 
-    let dirty = (get(this, 'dirtyAttributes') || []).concat()
+    let dirty = get(this, 'dirtyAttributes').concat()
+
     let attributes = meta.attributes
     let relationships = meta.relationships
     let props = attributes.concat(relationships)
@@ -437,7 +438,8 @@ let Model = Class.extend({
   */
 
   undirty (recursive) {
-    set(this, 'dirtyAttributes', [])
+    let dirty = get(this, 'dirtyAttributes')
+    dirty.splice(0, dirty.length)
     if (!recursive) return
 
     let meta = this.__meta
@@ -574,37 +576,25 @@ let Model = Class.extend({
   },
 
   destroy () {
-    let i,
-      p,
-      key,
-      val,
-      desc,
-      meta,
-      pMeta,
-      dirty,
-      relationships
-
     if (this.isDestroyed) return
 
-    meta = this.__meta
-    dirty = get(this, 'dirtyAttributes')
+    let meta = this.__meta
+    let relationships = meta.relationships
+    let i = relationships.length
 
-    relationships = meta.relationships
-    i = relationships.length
     while (i--) {
-      p = relationships[i]
-      desc = this.prop(p)
-      pMeta = desc.meta()
+      let p = relationships[i]
+      let desc = this.prop(p)
+      let pMeta = desc.meta()
 
-      key = pMeta.opts.key || p
+      let key = pMeta.opts.key || p
 
       if (pMeta.opts.embedded) {
-        val = get(this, key)
+        let val = get(this, key)
         if (val) { val.destroy() }
       }
     }
-
-    if (dirty) { dirty.destroy() }
+    set(this, 'dirty', null)
     if (this.store) { this.store.remove(this) }
 
     return this._super.apply(this, arguments)
