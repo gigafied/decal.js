@@ -26,7 +26,7 @@ describe('isDirty/isClean', function () {
     instance.b = 2
     instance.c = 1
 
-    expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a', 'c'])
+    expect(instance.dirtyAttributes).to.deep.equal(['a', 'c'])
     done()
   })
 
@@ -45,18 +45,18 @@ describe('isDirty/isClean', function () {
 
     expect(instance.isDirty).to.equal(true)
     expect(instance.isClean).to.equal(false)
-    expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a', 'c'])
+    expect(instance.dirtyAttributes).to.deep.equal(['a', 'c'])
 
     instance.a = 1
     instance.b = 2
     instance.c = 3
 
-    expect(instance.dirtyAttributes.toArray()).to.deep.equal([])
+    expect(instance.dirtyAttributes).to.deep.equal([])
     expect(instance.isDirty).to.equal(false)
     expect(instance.isClean).to.equal(true)
 
     instance.a = 5
-    expect(instance.dirtyAttributes.toArray()).to.deep.equal(['a'])
+    expect(instance.dirtyAttributes).to.deep.equal(['a'])
     expect(instance.isDirty).to.equal(true)
     expect(instance.isClean).to.equal(false)
 
