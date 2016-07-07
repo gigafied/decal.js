@@ -45,6 +45,7 @@ module.exports = function make (mKey, opts) {
       }
 
       if (val) assert('Must be a Collection.', val instanceof Collection)
+      if (data[key] instanceof Collection && val !== data[key]) data[key].destroy(opts.embedded)
 
       data[key] = val
     }
@@ -122,14 +123,13 @@ module.exports = function make (mKey, opts) {
           let record
           if (opts.embedded && typeof val[i] === 'object') {
             record = store.modelFor(mKey).create()
-            store.add(mKey, record)
             record.deserialize(val[i], override, filter)
           } else record = store.findOrCreate(mKey, val[i])
           records.push(record)
         }
       }
 
-      if (collection.length) collection.splice(0, collection.length - 1)
+      if (collection.length) collection.empty()
       collection.push(...records)
       set(this, key, collection)
       return collection
