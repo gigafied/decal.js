@@ -177,9 +177,18 @@ class DecalArray extends Array {
     return EMITTERS.get(this).removeAllListeners(event)
   }
 
+  empty () {
+    this.splice(0, this.length)
+  }
+
+  replaceWith (...args) {
+    this.empty()
+    this.push(...args)
+  }
+
   destroy () {
     this.emit('destroy')
-    this.splice(0, this.length)
+    this.empty()
     EMITTERS.get(this).removeAllListeners()
     EMITTERS.delete(this)
     LISTENERS.delete(this)
