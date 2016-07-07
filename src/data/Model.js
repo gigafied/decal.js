@@ -473,13 +473,12 @@ let Model = Class.extend({
     if (isNew && self.store) self.store.add(self)
 
     return this.adapter.saveRecord(this).then(function (json) {
-      self.emit('save', {
-        isNew: isNew,
-        updates: dirty
-      })
-
       self.deserialize(json, true)
       self.undirty(true)
+
+      if (isNew) self.emit('new')
+      else self.emit('save', dirty)
+
       set(self, 'isSaving', false)
       set(self, 'isLoaded', true)
       return self
@@ -523,7 +522,7 @@ let Model = Class.extend({
     set(this, 'isDeleting', true)
 
     return this.adapter.deleteRecord(this).then(function () {
-      self.emit('deleted')
+      self.emit('delete')
       if (self.store) self.store.remove(self)
       self.destroy()
       return self
