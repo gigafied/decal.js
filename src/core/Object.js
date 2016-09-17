@@ -80,7 +80,7 @@ function notifyWatchers (obj, meta) {
   if (meta.watchersQueued) return
   meta.watchersQueued = true
 
-  process.nextTick(() => {
+  setImmediate(() => {
     if (obj.isDestroyed) return
     let changed = meta.changedProps
     changed.forEach(p => changed.push(...(meta.computed[p] || [])))
