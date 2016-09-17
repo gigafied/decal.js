@@ -38,8 +38,7 @@ describe('find + filter', function () {
     )
 
     let b = a.filter(item => !item.hidden)
-
-    expect(b).to.deep.equal([
+    expect(b.toArray()).to.deep.equal([
       {val: 2, hidden: false},
       {val: 4, hidden: false}
     ])
@@ -57,7 +56,7 @@ describe('find + filter', function () {
 
     let b = a.filterBy('hidden', true)
 
-    expect(b).to.deep.equal([
+    expect(b.toArray()).to.deep.equal([
       {val: 1, hidden: true},
       {val: 3, hidden: true},
       {val: 5, hidden: true}
