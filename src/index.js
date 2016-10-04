@@ -1,6 +1,8 @@
 'use strict'
 
-module.exports = {
+global.DECAL_WATCH_ENABLED = true
+
+let decal = {
   // core
   Array: require('./core/Array'),
   Class: require('./core/Class'),
@@ -38,3 +40,5 @@ module.exports = {
   trim: require('./utils/trim'),
   warn: require('./utils/warn')
 }
+
+module.exports = decal

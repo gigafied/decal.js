@@ -77,7 +77,7 @@ function unwatchAll (obj) {
 }
 
 function notifyWatchers (obj, meta) {
-  if (meta.watchersQueued) return
+  if (meta.watchersQueued || !global.DECAL_WATCH_ENABLED) return
   meta.watchersQueued = true
 
   setImmediate(() => {
@@ -237,6 +237,7 @@ let Obj = CoreObject.extend({
   },
 
   propertyDidChange (prop) {
+    if (!global.DECAL_WATCH_ENABLED) return
     let meta = this.__meta
     if (!meta.watchers.size) return
     if (~meta.changedProps.indexOf(prop)) return
@@ -275,6 +276,7 @@ let Obj = CoreObject.extend({
   @param {Function} fn The function to call upon property changes.
   ***********************************************************************/
   watch (...args) {
+    if (!global.DECAL_WATCH_ENABLED) throw new Error('DECAL_WATCH_ENABLED is false')
     let fn = args[1]
     let props = args[0]
 
@@ -292,6 +294,7 @@ let Obj = CoreObject.extend({
   @param {Function|Array} fns The function(s) you no longer want to trigger on property changes.
   ***********************************************************************/
   unwatch (...args) {
+    if (!global.DECAL_WATCH_ENABLED) throw new Error('DECAL_WATCH_ENABLED is false')
     unwatch(this, ...args)
   },
 
@@ -306,6 +309,7 @@ let Obj = CoreObject.extend({
   @method unwatchAll
   ***********************************************************************/
   unwatchAll () {
+    if (!global.DECAL_WATCH_ENABLED) throw new Error('DECAL_WATCH_ENABLED is false')
     unwatchAll(this)
   },
 

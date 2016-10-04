@@ -37,7 +37,8 @@ module.exports = function (obj, key) {
       if (obj.isDestroyed) return null
       let meta = obj.__meta
       if (meta.getters[k]) obj = meta.getters[k].call(obj, k)
-      else obj = meta.values[k]
+      else if (global.DECAL_WATCH_ENABLED) obj = meta.values[k]
+      else obj = obj[k]
     } else obj = obj[k]
   }
   return obj

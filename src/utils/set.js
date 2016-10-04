@@ -51,6 +51,7 @@ function set (obj, key, val, quiet, skipCompare) {
       obj = obj[0]
     }
 
+    if (!global.DECAL_WATCH_ENABLED) skipCompare = quiet = true
     if (!skipCompare && get(obj, key) === val) return false
 
     if (obj instanceof CoreObject) {
