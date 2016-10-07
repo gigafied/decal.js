@@ -8,11 +8,15 @@ const EMITTER_METHODS = [
   'on', 'once', 'prependListener', 'prependOnceListener', 'removeAllListeners', 'removeListener', 'setMaxListeners'
 ]
 
-const EMITTERS = new Map()
-const LISTENERS = new Map()
+function CLEAR (listeners) {
+  for (let p in listeners) {
+    listeners[p].clear()
+    listeners[p] = null
+  }
+}
 
 function addItemEvent (arr, event) {
-  let listeners = LISTENERS.get(arr)
+  let listeners = arr._listeners
   if (!listeners[event]) {
     listeners[event] = new Map()
     arr.forEach(item => addItemListener(arr, item, event))
@@ -20,7 +24,7 @@ function addItemEvent (arr, event) {
 }
 
 function removeItemEvent (arr, event) {
-  let listeners = LISTENERS.get(arr)
+  let listeners = arr._listeners
   if (listeners[event]) {
     listeners[event].forEach((handler, item) => item.removeListener(event, handler))
     listeners[event].clear()
@@ -29,7 +33,7 @@ function removeItemEvent (arr, event) {
 }
 
 function addItemListener (arr, item, event) {
-  let listeners = LISTENERS.get(arr)
+  let listeners = arr._listeners
   let handler = function (...args) {
     arr.emit('item.' + event, item, ...args)
   }
@@ -40,14 +44,14 @@ function addItemListener (arr, item, event) {
 function onAdd (arr, item, emit) {
   if (emit !== false) arr.emit('add', item)
   if (typeof item.addListener === 'function') {
-    let listeners = LISTENERS.get(arr)
+    let listeners = arr._listeners
     for (let p in listeners) addItemListener(arr, item, p)
   }
 }
 
 function onRemove (arr, item) {
   arr.emit('remove', item)
-  let listeners = LISTENERS.get(arr)
+  let listeners = arr._listeners
   for (let p in listeners) {
     let handler = listeners[p].get(item)
     if (handler) {
@@ -65,8 +69,21 @@ class DecalArray extends Array {
 
   constructor (...args) {
     super(...args)
-    EMITTERS.set(this, new EventEmitter())
-    LISTENERS.set(this, {})
+
+    Object.defineProperty(this, '_listeners', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: {}
+    })
+
+    Object.defineProperty(this, '_emitter', {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: new EventEmitter()
+    })
+
     args.forEach(item => onAdd(this, item, false))
     return this
   }
@@ -163,18 +180,18 @@ class DecalArray extends Array {
 
   addListener (event, listener) {
     if (~event.indexOf('item.')) addItemEvent(this, event.split('item.')[1])
-    return EMITTERS.get(this).addListener(event, listener)
+    return this._emitter.addListener(event, listener)
   }
 
   removeListener (event, listener) {
     if (~event.indexOf('item.')) removeItemEvent(this, event.split('item.')[1])
-    return EMITTERS.get(this).removeListener(event, listener)
+    return this._emitter.removeListener(event, listener)
   }
 
   removeAllListeners (event) {
     if (~event.indexOf('item.')) removeItemEvent(this, event.split('item.')[1])
-    if (!event) LISTENERS.get(this).clear()
-    return EMITTERS.get(this).removeAllListeners(event)
+    if (!event) CLEAR(this._listeners)
+    return this._emitter.removeAllListeners(event)
   }
 
   empty () {
@@ -189,16 +206,15 @@ class DecalArray extends Array {
   destroy () {
     this.emit('destroy')
     this.empty()
-    EMITTERS.get(this).removeAllListeners()
-    EMITTERS.delete(this)
-    LISTENERS.delete(this)
+    this._emitter.removeAllListeners()
+    CLEAR(this._listeners)
   }
 }
 
 EMITTER_METHODS.forEach(name => {
   if (DecalArray.prototype[name]) return
   DecalArray.prototype[name] = function (...args) {
-    return EMITTERS.get(this)[name](...args)
+    return this._emitter[name](...args)
   }
 })
 
