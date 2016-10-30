@@ -330,6 +330,7 @@ let Model = Class.extend({
   */
 
   serializeDirty (filter) {
+    if (this.isDestroyed) return {}
     let meta = this.__meta
     let attributes = meta.attributes
     let relationships = meta.relationships
@@ -366,11 +367,11 @@ let Model = Class.extend({
   */
 
   deserialize (json, override, filter) {
+    if (this.isDestroyed) return this
     let meta = this.__meta
-
     if (!json) return this
 
-    let dirty = get(this, 'dirtyAttributes').concat()
+    let dirty = (get(this, 'dirtyAttributes') || []).concat()
 
     let attributes = meta.attributes
     let relationships = meta.relationships
@@ -438,7 +439,9 @@ let Model = Class.extend({
   */
 
   undirty (recursive) {
+    if (this.isDestroyed) return
     let dirty = get(this, 'dirtyAttributes')
+    if (!dirty || !dirty.length) return
     dirty.splice(0, dirty.length)
     if (!recursive) return
 
@@ -593,7 +596,7 @@ let Model = Class.extend({
         if (val) { val.destroy() }
       }
     }
-    set(this, 'dirty', null)
+    set(this, 'dirtyAttributes', null)
     if (this.store) { this.store.remove(this) }
 
     return this._super.apply(this, arguments)
