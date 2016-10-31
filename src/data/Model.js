@@ -476,6 +476,7 @@ let Model = Class.extend({
     if (isNew && self.store) self.store.add(self)
 
     return this.adapter.saveRecord(this).then(function (json) {
+      if (self.isDestroyed) return self
       self.deserialize(json, true)
       self.undirty(true)
 
