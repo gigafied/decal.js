@@ -329,7 +329,7 @@ let Model = Class.extend({
   @return {Object}
   */
 
-  serializeDirty (filter) {
+  serializeDirty (filter, partialEmbedded = true) {
     if (this.isDestroyed) return {}
     let meta = this.__meta
     let attributes = meta.attributes
@@ -344,10 +344,16 @@ let Model = Class.extend({
       let pMeta = desc.meta()
       let key = pMeta.opts.key || p
 
-      if (
-        pMeta.isRelationship && pMeta.opts.embedded ||
-        pMeta.isAttribute && ~dirty.indexOf(p)
-      ) {
+      if (pMeta.isRelationship && pMeta.opts.embedded) {
+        if (partialEmbedded) {
+          let val = pMeta.serializeDirty.call(this, filter)
+          if (typeof val !== 'undefined') set(json, key, val)
+        } else {
+          if (get(this, key).isDirty) {
+            set(json, key, pMeta.serialize.call(this, filter))
+          }
+        }
+      } else if (pMeta.isAttribute && ~dirty.indexOf(p)) {
         let val = pMeta.serializeDirty.call(this, filter)
         if (typeof val !== 'undefined') set(json, key, val)
       }
