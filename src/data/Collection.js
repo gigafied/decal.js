@@ -18,6 +18,11 @@ module.exports = class Collection extends DecalArray {
     }
   }
 
+  get isDirty () {
+    for (let i = 0; i < this.length; i++) if (this[i].isDirty) return true
+    return false
+  }
+
   constructor (...args) {
     super(...args)
     this.__recordsByPK = {}
