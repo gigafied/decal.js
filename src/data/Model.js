@@ -425,11 +425,12 @@ let Model = Class.extend({
   patch (obj) {
     function updateRecursively (obj2, context) {
       for (let p in obj2) {
-        if (typeof obj2[p] === 'object') {
-          updateRecursively(obj2[p], context[p])
+        let val = obj2[p]
+        if (val && typeof val === 'object') {
+          updateRecursively(val, context[p])
           continue
         }
-        set(context, p, obj2[p])
+        set(context, p, val)
       }
     }
     updateRecursively(obj, this)
