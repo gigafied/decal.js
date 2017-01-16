@@ -448,9 +448,9 @@ let Model = Class.extend({
   undirty (recursive) {
     if (this.isDestroyed) return
     let dirty = get(this, 'dirtyAttributes')
-    if (!dirty || !dirty.length) return
-    dirty.splice(0, dirty.length)
-    if (!recursive) return
+    if (dirty && dirty.length) {
+      dirty.splice(0, dirty.length)
+    } else if (!recursive) return
 
     let meta = this.__meta
     let relationships = meta.relationships
