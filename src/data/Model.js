@@ -484,7 +484,6 @@ let Model = Class.extend({
 
     return this.adapter.saveRecord(this).then(function (json) {
       if (self.isDestroyed) return self
-      self.deserialize(json, true)
       self.undirty(true)
 
       if (isNew) self.emit('new')
