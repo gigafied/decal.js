@@ -469,30 +469,39 @@ let Model = Class.extend({
   /**
   Saves any changes to this record to the persistence layer (via the adapter).
   Also adds this record to the store.
-
+``
   @method save
   @return {Promise}
   */
 
   save () {
-    let self = this
+    if (this.savePromise) return this.savePromise.then(() => this.save())
+
     let isNew = get(this, 'isNew')
     let dirty = isNew ? {} : this.serializeDirty()
     set(this, 'isSaving', true)
 
-    if (isNew && self.store) self.store.add(self)
+    if (isNew && this.store) this.store.add(this)
 
-    return this.adapter.saveRecord(this).then(function (json) {
-      if (self.isDestroyed) return self
-      self.undirty(true)
+    this.savePromise = this.adapter.saveRecord(this).then(json => {
+      this.savePromise = null
+      if (this.isDestroyed) return this
 
-      if (isNew) self.emit('new')
-      else self.emit('save', dirty)
+      this.undirty(true)
 
-      set(self, 'isSaving', false)
-      set(self, 'isLoaded', true)
-      return self
+      if (isNew) this.emit('new')
+      else this.emit('save', dirty)
+
+      set(this, 'isSaving', false)
+      set(this, 'isLoaded', true)
+
+      return this
+    }).catch(err => {
+      this.savePromise = null
+      throw err
     })
+
+    return this.savePromise
   },
 
   /**
@@ -503,20 +512,19 @@ let Model = Class.extend({
   */
 
   fetch (override) {
-    let self = this
     let isNew = get(this, 'isNew')
 
     assert('Can\'t fetch records without a primary key.', !isNew)
 
     set(this, 'isFetching', true)
 
-    return this.adapter.fetchRecord(this).then(function (json) {
-      self.deserialize(json, !!override)
-      self.emit('fetch')
-      if (override) self.undirty(true)
-      set(self, 'isFetching', false)
-      set(self, 'isLoaded', true)
-      return self
+    return this.adapter.fetchRecord(this).then(json => {
+      this.deserialize(json, !!override)
+      this.emit('fetch')
+      if (override) this.undirty(true)
+      set(this, 'isFetching', false)
+      set(this, 'isLoaded', true)
+      return this
     })
   },
 
@@ -528,14 +536,13 @@ let Model = Class.extend({
   */
 
   delete () {
-    let self = this
     set(this, 'isDeleting', true)
 
-    return this.adapter.deleteRecord(this).then(function () {
-      self.emit('delete')
-      if (self.store) self.store.remove(self)
-      self.destroy()
-      return self
+    return this.adapter.deleteRecord(this).then(() => {
+      this.emit('delete')
+      if (this.store) this.store.remove(this)
+      this.destroy()
+      return this
     })
   },
 
