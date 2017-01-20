@@ -353,8 +353,8 @@ let Model = Class.extend({
             set(json, key, pMeta.serialize.call(this, filter))
           }
         }
-      } else if (pMeta.isAttribute && ~dirty.indexOf(p)) {
-        let val = pMeta.serializeDirty.call(this, filter)
+      } else if (~dirty.indexOf(p)) {
+        let val = pMeta.isAttribute ? pMeta.serializeDirty.call(this, filter) : pMeta.serialize.call(this, filter)
         if (typeof val !== 'undefined') set(json, key, val)
       }
     }
