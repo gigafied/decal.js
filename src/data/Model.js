@@ -487,10 +487,10 @@ let Model = Class.extend({
       this.savePromise = null
       if (this.isDestroyed) return this
 
-      this.undirty(true)
-
       if (isNew) this.emit('new')
       else this.emit('save', dirty)
+
+      this.undirty(true)
 
       set(this, 'isSaving', false)
       set(this, 'isLoaded', true)
