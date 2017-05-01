@@ -75,6 +75,7 @@ const set = require('../utils/set')
 const assert = require('../utils/assert')
 const computed = require('../utils/computed')
 const Class = require('../core/Class')
+const PromiseQueue = require('../utils/PromiseQueue')
 
 let Model = Class.extend({
 
@@ -279,6 +280,7 @@ let Model = Class.extend({
     }
 
     meta.pristineData = {}
+    meta.saveQueue = new PromiseQueue()
 
     if (typeof props === 'object') this.deserialize(props)
     dirty.splice(0, dirty.length)
@@ -475,33 +477,30 @@ let Model = Class.extend({
   */
 
   save () {
-    if (this.savePromise) return this.savePromise.then(() => this.save())
+    let saveQueue = this.__meta.saveQueue
 
-    let isNew = get(this, 'isNew')
-    let dirty = isNew ? {} : this.serializeDirty()
-    set(this, 'isSaving', true)
+    return saveQueue.add(() => {
+      let isNew = get(this, 'isNew')
+      set(this, 'isSaving', true)
+      if (!this.__meta.saveEvent) this.__meta.saveEvent = isNew ? 'new' : 'save'
 
-    if (isNew && this.store) this.store.add(this)
+      if (isNew && this.store) this.store.add(this)
 
-    this.savePromise = this.adapter.saveRecord(this).then(json => {
-      this.savePromise = null
-      if (this.isDestroyed) return this
+      return this.adapter.saveRecord(this).then(json => {
+        if (this.isDestroyed || saveQueue.length > 1) return this
 
-      if (isNew) this.emit('new')
-      else this.emit('save', dirty)
+        if (this.__meta.saveEvent === 'new') {
+          this.emit('new')
+          this.__meta.saveEvent = 'save'
+        } else this.emit('save', this.serializeDirty())
 
-      this.undirty(true)
+        this.undirty(true)
+        set(this, 'isSaving', false)
+        set(this, 'isLoaded', true)
 
-      set(this, 'isSaving', false)
-      set(this, 'isLoaded', true)
-
-      return this
-    }).catch(err => {
-      this.savePromise = null
-      throw err
+        return this
+      })
     })
-
-    return this.savePromise
   },
 
   /**

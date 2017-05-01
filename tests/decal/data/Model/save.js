@@ -33,6 +33,24 @@ describe('save', function () {
     instance.save()
   })
 
+  it('should queue multiple saves as one \'new\' event', function (done) {
+    let instance = Model.create()
+    let newCount = 0
+    let saveCount = 0
+    instance.on('new', () => newCount++)
+    instance.on('save', () => saveCount++)
+    instance.a = 'A'
+    instance.save()
+    instance.b = 'B'
+    instance.save()
+    instance.c = 'C'
+    instance.save().then(() => {
+      expect(newCount).to.equal(1)
+      expect(saveCount).to.equal(0)
+      done()
+    })
+  })
+
   it('should queue multiple saves as one \'save\' event', function (done) {
     let instance = Model.create()
     let count = 0
@@ -49,8 +67,8 @@ describe('save', function () {
       instance.a = 'A'
       instance.c = 'C'
       instance.save().then(() => {
-        expect(count).to.equal(1)
         expect(eventUpdates).to.deep.equal({a: 'A', b: 'B', c: 'C'})
+        expect(count).to.equal(1)
         done()
       })
     })
