@@ -33,12 +33,16 @@ describe('save', function () {
     instance.save()
   })
 
-  it('should queue multiple saves as one \'new\' event', function (done) {
+  it('should fire save events after new and keep track of all changes', function (done) {
     let instance = Model.create()
     let newCount = 0
     let saveCount = 0
+    let eventUpdates = {}
     instance.on('new', () => newCount++)
-    instance.on('save', () => saveCount++)
+    instance.on('save', updates => {
+      Object.assign(eventUpdates, updates)
+      saveCount++
+    })
     instance.a = 'A'
     instance.save()
     instance.b = 'B'
@@ -46,18 +50,19 @@ describe('save', function () {
     instance.c = 'C'
     instance.save().then(() => {
       expect(newCount).to.equal(1)
-      expect(saveCount).to.equal(0)
+      expect(saveCount).to.equal(3)
+      expect(eventUpdates).to.deep.equal({a: 'A', b: 'B', c: 'C'})
       done()
     })
   })
 
-  it('should queue multiple saves as one \'save\' event', function (done) {
+  it('should fire multiple save events without losing track of changes', function (done) {
     let instance = Model.create()
     let count = 0
-    let eventUpdates
+    let eventUpdates = {}
     instance.save().then(() => {
       instance.on('save', updates => {
-        eventUpdates = updates
+        Object.assign(eventUpdates, updates)
         count++
       })
       instance.a = 'aa'
@@ -68,7 +73,7 @@ describe('save', function () {
       instance.c = 'C'
       instance.save().then(() => {
         expect(eventUpdates).to.deep.equal({a: 'A', b: 'B', c: 'C'})
-        expect(count).to.equal(1)
+        expect(count).to.equal(4)
         done()
       })
     })

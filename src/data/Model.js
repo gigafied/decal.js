@@ -482,18 +482,14 @@ let Model = Class.extend({
     return saveQueue.add(() => {
       let isNew = get(this, 'isNew')
       set(this, 'isSaving', true)
-      if (!this.__meta.saveEvent) this.__meta.saveEvent = isNew ? 'new' : 'save'
 
-      if (isNew && this.store) this.store.add(this)
+      if (isNew) {
+        this.emit('new')
+        this.store.add(this)
+      } else this.emit('save', this.serializeDirty())
 
       return this.adapter.saveRecord(this).then(json => {
         if (this.isDestroyed || saveQueue.length > 1) return this
-
-        if (this.__meta.saveEvent === 'new') {
-          this.emit('new')
-          this.__meta.saveEvent = 'save'
-        } else this.emit('save', this.serializeDirty())
-
         this.undirty(true)
         set(this, 'isSaving', false)
         set(this, 'isLoaded', true)
