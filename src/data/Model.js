@@ -486,8 +486,8 @@ let Model = Class.extend({
       let promise = this.adapter.saveRecord(this)
 
       if (isNew) {
-        this.emit('new')
         this.store.add(this)
+        this.emit('new')
       } else this.emit('save', this.serializeDirty())
 
       this.undirty(true)
