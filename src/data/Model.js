@@ -488,7 +488,7 @@ let Model = Class.extend({
       if (isNew) {
         this.store.add(this)
         this.emit('new')
-      } else this.emit('save', this.serializeDirty())
+      } else this.emit('save', Object.freeze(this.serializeDirty()))
 
       this.undirty(true)
 
