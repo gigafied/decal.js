@@ -480,6 +480,16 @@ let Model = Class.extend({
     let saveQueue = this.__meta.saveQueue
 
     return saveQueue.add(() => {
+      if (get(this, 'isDeleting')) {
+        const errMsg = 'Trying to save model but model is currently being deleted'
+        return Promise.reject(new Error(errMsg))
+      }
+
+      if (this.isDestroyed) {
+        const errMsg = 'Trying to save model but model has been destroyed.'
+        return Promise.reject(new Error(errMsg))
+      }
+
       let isNew = get(this, 'isNew')
       set(this, 'isSaving', true)
 
