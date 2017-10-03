@@ -344,14 +344,15 @@ let Model = Class.extend({
       let p = props[i]
       let desc = this.prop(p)
       let pMeta = desc.meta()
+      let type = pMeta.type
       let key = pMeta.opts.key || p
 
-      if (pMeta.isRelationship && pMeta.opts.embedded) {
-        if (partialEmbedded) {
+      if (pMeta.isRelationship && (pMeta.opts.embedded || type === 'hasMany')) {
+        if (partialEmbedded && (pMeta.opts.embedded || type !== 'hasMany')) {
           let val = pMeta.serializeDirty.call(this, filter)
           if (typeof val !== 'undefined') set(json, key, val)
         } else {
-          if (get(this, key).isDirty) {
+          if (get(this, key).isDirty || type === 'hasMany') {
             set(json, key, pMeta.serialize.call(this, filter))
           }
         }
