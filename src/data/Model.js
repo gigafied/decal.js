@@ -479,7 +479,6 @@ let Model = Class.extend({
 
   save () {
     let saveQueue = this.__meta.saveQueue
-
     return saveQueue.add(() => {
       let isNew = get(this, 'isNew')
       set(this, 'isSaving', true)

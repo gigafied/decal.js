@@ -50,7 +50,7 @@ describe('save', function () {
     instance.c = 'C'
     instance.save().then(() => {
       expect(newCount).to.equal(1)
-      expect(saveCount).to.equal(3)
+      expect(saveCount).to.equal(2)
       expect(eventUpdates).to.deep.equal({b: 'B', c: 'C'})
       done()
     })
@@ -73,7 +73,7 @@ describe('save', function () {
       instance.c = 'C'
       instance.save().then(() => {
         expect(eventUpdates).to.deep.equal({a: 'A', b: 'B', c: 'C'})
-        expect(count).to.equal(4)
+        expect(count).to.equal(3)
         done()
       })
     })
