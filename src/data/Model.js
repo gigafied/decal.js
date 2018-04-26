@@ -484,12 +484,16 @@ let Model = Class.extend({
       set(this, 'isSaving', true)
 
       if (isNew) this.store.add(this)
-      else this.emit('save', Object.freeze(this.serializeDirty()))
 
       let promise = this.adapter.saveRecord(this)
-      if (isNew) this.emit('new')
-
-      this.undirty(true)
+      if (isNew) {
+        this.emit('new')
+        this.undirty(true)
+      } else {
+        const dirty = Object.freeze(this.serializeDirty())
+        this.undirty(true)
+        this.emit('save', dirty)
+      }
 
       return promise.then(json => {
         if (this.isDestroyed || saveQueue.length > 1) return this
