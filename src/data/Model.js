@@ -421,7 +421,7 @@ let Model = Class.extend({
   Patches a record, recursively.
 
   @method patch
-  @param  {Boolean} recursive Whather you want to undirty all embedded relationships as well.
+  @param  {Object} The data you want to update.
   @return {Model}
   */
 
