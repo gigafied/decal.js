@@ -352,7 +352,7 @@ let Model = Class.extend({
           let val = pMeta.serializeDirty.call(this, filter)
           if (typeof val !== 'undefined') set(json, key, val)
         } else {
-          if (get(this, key).isDirty || type === 'hasMany') {
+          if (get(this, key).isDirty || (type === 'hasMany' && !pMeta.opts.embedded)) {
             set(json, key, pMeta.serialize.call(this, filter))
           }
         }
