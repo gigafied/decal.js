@@ -375,7 +375,7 @@ let Model = Class.extend({
   @return {Model}
   */
 
-  deserialize (json, override, filter) {
+  deserialize (json, override, filter, resetDirty = true) {
     if (this.isDestroyed) return this
     let meta = this.__meta
     if (!json) return this
@@ -395,7 +395,7 @@ let Model = Class.extend({
 
       if (~di) {
         if (!override) continue
-        dirty.splice(i, 1)
+        if (resetDirty) dirty.splice(i, 1)
       }
 
       let key = pMeta.opts.key || p
@@ -411,7 +411,7 @@ let Model = Class.extend({
       set(this, 'pk', json[this.primaryKey])
     }
 
-    set(this, 'dirtyAttributes', dirty)
+    if (resetDirty) set(this, 'dirtyAttributes', dirty)
     set(this, 'isLoaded', true)
 
     return this
@@ -490,7 +490,7 @@ let Model = Class.extend({
         this.emit('new')
         this.undirty(true)
       } else {
-        const dirty = Object.freeze(this.serializeDirty())
+        const dirty = Object.freeze(this.serializeDirty(null, false))
         this.undirty(true)
         this.emit('save', dirty)
       }

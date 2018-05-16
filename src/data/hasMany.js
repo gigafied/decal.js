@@ -87,7 +87,7 @@ module.exports = function make (mKey, opts) {
       return hasMany.meta().serialize.call(this, filter, true)
     },
 
-    deserialize (val, override, filter) {
+    deserialize (val, override, filter, resetDirty = true) {
       let meta = hasMany.meta()
       let key = meta.key
       let map = opts.map || {}
@@ -123,7 +123,7 @@ module.exports = function make (mKey, opts) {
           let record
           if (opts.embedded && typeof val[i] === 'object') {
             record = store.modelFor(mKey).create()
-            record.deserialize(val[i], override, filter)
+            record.deserialize(val[i], override, filter, resetDirty)
           } else record = store.findOrCreate(mKey, val[i])
           records.push(record)
         }

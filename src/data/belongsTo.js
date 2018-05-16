@@ -93,7 +93,7 @@ module.exports = function make (mKey, opts) {
       return belongsTo.meta().serialize.call(this, filter, true)
     },
 
-    deserialize (val, override, filter) {
+    deserialize (val, override, filter, resetDirty = true) {
       let meta = belongsTo.meta()
       let key = meta.key
       let store = this.store
