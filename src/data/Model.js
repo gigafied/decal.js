@@ -348,11 +348,12 @@ let Model = Class.extend({
       let key = pMeta.opts.key || p
 
       if (pMeta.isRelationship && (pMeta.opts.embedded || type === 'hasMany')) {
-        // Because we don't dirty collections when items are added or removed, we have to always serialize non embedded hasManys
-        if (get(this, key).isDirty || (type === 'hasMany' && !pMeta.opts.embedded)) set(json, key, pMeta.serialize.call(this, filter))
-        else if (partialEmbedded && pMeta.opts.embedded) {
+        if (partialEmbedded && (pMeta.opts.embedded || type !== 'hasMany')) {
           const val = pMeta.serializeDirty.call(this, filter)
           if (typeof val !== 'undefined') set(json, key, val)
+        } else if (get(this, key).isDirty || (type === 'hasMany' && !pMeta.opts.embedded)) {
+          // Because we don't dirty collections when items are added or removed, we have to always serialize non embedded hasManys
+          set(json, key, pMeta.serialize.call(this, filter))
         }
       } else if (~dirty.indexOf(p)) {
         const val = pMeta.isAttribute ? pMeta.serializeDirty.call(this, filter) : pMeta.serialize.call(this, filter)

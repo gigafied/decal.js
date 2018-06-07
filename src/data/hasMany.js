@@ -38,10 +38,10 @@ module.exports = function make (mKey, opts) {
           let dirtyIdx = dirty.indexOf(key)
           if (pristine[key] === val && ~dirtyIdx) dirty.splice(dirtyIdx, 1)
           else if (!~dirtyIdx) dirty.push(key)
+        } else {
+          pristine[key] = typeof data[key] !== 'undefined' ? data[key] : opts.defaultValue
+          dirty.push(key)
         }
-      } else {
-        pristine[key] = typeof data[key] !== 'undefined' ? data[key] : opts.defaultValue
-        dirty.push(key)
       }
 
       if (val) assert('Must be a Collection.', val instanceof Collection)
