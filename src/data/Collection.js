@@ -19,6 +19,7 @@ module.exports = class Collection extends DecalArray {
   }
 
   get isDirty () {
+    if (this._isDirty) return true
     for (let i = 0; i < this.length; i++) if (this[i].isDirty) return true
     return false
   }
@@ -41,6 +42,7 @@ module.exports = class Collection extends DecalArray {
   }
 
   push (...args) {
+    this._isDirty = true
     for (let i = 0, l = args.length; i < l; i++) {
       let record = args[i]
       let pk = get(record, 'pk')
@@ -52,6 +54,7 @@ module.exports = class Collection extends DecalArray {
   }
 
   remove (record) {
+    this._isDirty = true
     if (record.pk) delete this.__recordsByPK[record.pk]
     return super.remove(record)
   }
@@ -79,6 +82,7 @@ module.exports = class Collection extends DecalArray {
   }
 
   undirty (recursive) {
+    this._isDirty = false
     this.forEach(item => item.undirty(recursive))
   }
 
