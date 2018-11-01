@@ -50,11 +50,12 @@ module.exports = function make (mKey, opts) {
         }
       }
 
-      if (store && !(val instanceof store.__registry[mKey])) {
-        if (typeof val !== 'string' && typeof val !== 'number') val = String(val)
-        val = store.findOrCreate(mKey, val)
-      }
-
+      if (val) {
+        if (store && !(val instanceof store.__registry[mKey])) {
+          if (typeof val !== 'string' && typeof val !== 'number') val = String(val)
+          val = opts.embedded ? store.findOrCreate(mKey, val) : store.find(mKey, val)
+        }
+      } else val = null
       data[key] = val
     }
   })
