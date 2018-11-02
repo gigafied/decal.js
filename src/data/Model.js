@@ -462,7 +462,10 @@ let Model = Class.extend({
       let p = relationships[i]
       let desc = this.prop(p)
       let pMeta = desc.meta()
-      if (pMeta.opts.embedded) get(this, p).undirty(true)
+      if (pMeta.opts.embedded) {
+        let val = get(this, p)
+        if (val && typeof val.undirty === 'function') val.undirty(true)
+      }
     }
 
     return this
