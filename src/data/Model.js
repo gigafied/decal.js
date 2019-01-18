@@ -429,7 +429,7 @@ let Model = Class.extend({
     function updateRecursively (obj2, context) {
       for (let p in obj2) {
         let val = obj2[p]
-        if (val && typeof val === 'object') {
+        if (val && typeof val === 'object' && !Array.isArray(val)) {
           updateRecursively(val, context[p])
           continue
         }
