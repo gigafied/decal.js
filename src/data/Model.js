@@ -402,7 +402,7 @@ let Model = Class.extend({
       let val = get(json, key)
 
       if (typeof val !== 'undefined' && (!filter || filter(pMeta, key, val))) {
-        val = pMeta.deserialize.call(this, val, override, filter)
+        val = pMeta.deserialize.call(this, val, override, filter, resetDirty)
         meta.pristineData[p] = val
       }
     }

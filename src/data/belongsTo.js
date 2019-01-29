@@ -101,7 +101,7 @@ module.exports = function make (mKey, opts) {
 
       if (opts.embedded) {
         let record = get(this, key) || store.__registry[mKey].create()
-        if (val && typeof val === 'object') val = record.deserialize(val, override, filter)
+        if (val && typeof val === 'object') val = record.deserialize(val, override, filter, resetDirty)
       }
 
       set(this, key, val)
