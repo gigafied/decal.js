@@ -52,7 +52,6 @@ module.exports = function make (type, opts) {
   })
 
   attr.meta({
-
     type: type,
     isAttribute: true,
     opts: opts,

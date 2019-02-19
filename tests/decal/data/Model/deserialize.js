@@ -1,15 +1,15 @@
 describe('deserialize', function () {
   it('should properly deserialize objects into records.', function () {
     let Model = decal.Model.extend({
-      a: decal.attr(),
-      b: decal.attr()
+      a: decal.attr({key: 'a2'}),
+      b: decal.attr({key: 'b2'})
     })
 
     let json = [
-      {a: '1', b: '2'},
-      {a: '2', b: '3'},
-      {a: '3', b: '4'},
-      {a: '4', b: '5'}
+      {a2: '1', b2: '2'},
+      {a2: '2', b2: '3'},
+      {a2: '3', b2: '4'},
+      {a2: '4', b2: '5'}
     ]
 
     let instance1 = Model.create()
@@ -34,14 +34,7 @@ describe('deserialize', function () {
     expect(instance4.a).to.equal('4')
     expect(instance4.b).to.equal('5')
 
-    let deserialized = [
-      instance1.getProperties(['a', 'b']),
-      instance2.getProperties(['a', 'b']),
-      instance3.getProperties(['a', 'b']),
-      instance4.getProperties(['a', 'b'])
-    ]
-
-    expect(deserialized).to.deep.equal(json)
+    expect([instance1.serialize(), instance2.serialize(), instance3.serialize(), instance4.serialize()]).to.deep.equal(json)
 
     instance1.destroy()
     instance2.destroy()

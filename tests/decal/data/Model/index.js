@@ -6,6 +6,7 @@ describe('Decal.Model', function () {
   require('./deserialize')
   require('./dirtyChecks')
   require('./belongsTo')
+  require('./hasOne')
   require('./hasMany')
   require('./save')
 })

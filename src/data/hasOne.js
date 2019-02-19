@@ -1,7 +1,7 @@
 /**
-Define a belongsTo relationship.
+Define a hasOne relationship.
 
-@method belongsTo
+@method hasOne
 @param  {String} modelKey The modelKey of the relationship.
 @param  {Object} opts Options for the relationship.
 @return {ComputedProperty}
@@ -16,14 +16,16 @@ const computed = require('../utils/computed')
 module.exports = function make (mKey, opts) {
   opts = opts || {}
 
-  let belongsTo = computed({
+  let hasOne = computed({
 
     get (key) {
+      let store = this.store
       let meta = this.__meta
       let val = null
 
       if (typeof this.__meta.data[key] === 'undefined') {
         if (typeof opts.defaultValue !== 'undefined') val = opts.defaultValue
+        else if (opts.embedded) val = store.__registry[mKey].create()
         if (typeof val !== 'undefined') meta.data[key] = val
       }
 
@@ -51,16 +53,16 @@ module.exports = function make (mKey, opts) {
       if (val) {
         if (store && !(val instanceof store.__registry[mKey])) {
           if (typeof val !== 'string' && typeof val !== 'number') val = String(val)
-          val = store.find(mKey, val)
+          val = opts.embedded ? store.findOrCreate(mKey, val) : store.find(mKey, val)
         }
       } else val = null
       data[key] = val
     }
   })
 
-  belongsTo.meta({
+  hasOne.meta({
 
-    type: 'belongsTo',
+    type: 'hasOne',
     isRelationship: true,
     opts: opts,
     relationshipKey: mKey,
@@ -69,39 +71,52 @@ module.exports = function make (mKey, opts) {
       let key,
         val,
         meta,
-        store
+        store,
+        undef
 
-      meta = belongsTo.meta()
+      meta = hasOne.meta()
       key = meta.key
       store = this.store
 
       val = get(this, key)
 
-      if (val && val instanceof store.__registry[mKey]) val = get(val, 'pk')
+      if (val && val instanceof store.__registry[mKey]) {
+        if (opts.embedded) {
+          val = dirty ? val.serializeDirty(filter) : val.serialize(filter)
+          if (dirty && Object.keys(val).length === 0) { val = undef }
+        } else val = get(val, 'pk')
+      }
+
       if (!filter || filter(meta, key, val)) return val
     },
 
     serializeDirty (filter) {
-      return belongsTo.meta().serialize.call(this, filter, true)
+      return hasOne.meta().serialize.call(this, filter, true)
     },
 
     deserialize (val, override, filter, resetDirty = true) {
-      let meta = belongsTo.meta()
+      let meta = hasOne.meta()
       let key = meta.key
+      let store = this.store
+
+      if (opts.embedded) {
+        let record = get(this, key) || store.__registry[mKey].create()
+        if (val && typeof val === 'object') val = record.deserialize(val, override, filter, resetDirty)
+      }
 
       set(this, key, val)
       return val
     },
 
     revert (revertRelationships) {
-      let val = get(this, belongsTo.meta().key)
+      let val = get(this, hasOne.meta().key)
       if (val) val.revert(revertRelationships)
     }
   })
 
-  belongsTo.clone = function () {
+  hasOne.clone = function () {
     return make(mKey, opts)
   }
 
-  return belongsTo
+  return hasOne
 }

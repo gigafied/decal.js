@@ -15,6 +15,7 @@ let decal = {
   belongsTo: require('./data/belongsTo'),
   Collection: require('./data/Collection'),
   hasMany: require('./data/hasMany'),
+  hasOne: require('./data/hasOne'),
   Model: require('./data/Model'),
   Store: require('./data/Store'),
 
