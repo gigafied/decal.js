@@ -242,9 +242,9 @@ module.exports = Class.extend({
   @return {decal.Model}
   */
 
-  createRecord (mKey, data) {
+  createRecord (mKey, data, addToStore = true) {
     let record = this.modelFor(mKey).create(data)
-    this.add(mKey, record)
+    if (addToStore) this.add(mKey, record)
     return record
   },
 
