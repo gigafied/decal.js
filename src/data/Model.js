@@ -482,11 +482,18 @@ let Model = Class.extend({
 
   save () {
     let saveQueue = this.__meta.saveQueue
+    const saveErr = new Error(`Could not save ${this.modelKey}`)
     return saveQueue.add(() => {
-      let isNew = get(this, 'isNew')
-      set(this, 'isSaving', true)
-
-      if (isNew) this.store.add(this)
+      let isNew
+      try {
+        isNew = get(this, 'isNew')
+        set(this, 'isSaving', true)
+        if (isNew) this.store.add(this)
+      } catch (err) {
+        const err2 = new Error(`${saveErr.message} : ${err.message}`)
+        err2.stack = saveErr.stack
+        return Promise.reject(err2)
+      }
 
       let promise = this.adapter.saveRecord(this)
       if (isNew) {
@@ -504,6 +511,10 @@ let Model = Class.extend({
         set(this, 'isLoaded', true)
 
         return this
+      }).catch(err => {
+        const err2 = new Error(`${saveErr.message} : ${err.message}`)
+        err2.stack = saveErr.stack
+        throw err2
       })
     })
   },
