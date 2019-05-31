@@ -83,6 +83,9 @@ module.exports = function make (type, opts) {
     return make(type, opts)
   }
 
+  if (opts.validation) attr.validation = opts.validation
+  else if (type === Boolean) attr.validation = { type: 'boolean' }
+
   return attr
 }
 

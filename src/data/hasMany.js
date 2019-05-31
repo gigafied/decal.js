@@ -154,5 +154,7 @@ module.exports = function make (mKey, opts) {
     return make(mKey, opts)
   }
 
+  if (opts.validation) hasMany.validation = opts.validation
+
   return hasMany
 }

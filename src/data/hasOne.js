@@ -118,5 +118,7 @@ module.exports = function make (mKey, opts) {
     return make(mKey, opts)
   }
 
+  if (opts.validation) hasOne.validation = opts.validation
+
   return hasOne
 }
