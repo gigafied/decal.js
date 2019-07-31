@@ -492,7 +492,7 @@ let Model = Class.extend({
       } catch (err) {
         const err2 = new Error(`${saveErr.message} : ${err.message}`)
         err2.stack = saveErr.stack
-        return Promise.reject(err2)
+        throw err2
       }
 
       let promise = this.adapter.saveRecord(this)
