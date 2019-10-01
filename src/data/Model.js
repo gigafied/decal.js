@@ -491,7 +491,7 @@ let Model = Class.extend({
         if (isNew) this.store.add(this)
       } catch (err) {
         const err2 = new Error(`${saveErr.message} : ${err.message}`)
-        err2.stack = saveErr.stack
+        err2.stack += saveErr.stack
         throw err2
       }
 
@@ -513,7 +513,7 @@ let Model = Class.extend({
         return this
       }).catch(err => {
         const err2 = new Error(`${saveErr.message} : ${err.message}`)
-        err2.stack = saveErr.stack
+        err2.stack += saveErr.stack
         throw err2
       })
     })
