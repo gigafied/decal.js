@@ -14,7 +14,7 @@ let Person = decal.Object.extend({
     lastLame : '',
     fullName : decal.computed(function () {
         return this.firstName + ' ' + this.lastName
-    }, 'firstName', 'lastName')
+    }, ['firstName', 'lastName'], opts)
 })
 
 personInstance = Person.create({firstName : 'Jane', lastName : 'Doe'})
@@ -43,6 +43,10 @@ let personInstance = decal.Object.create({
             this.lastName = val[1] || ''
             return val.join(' ')
         }
+    },
+    opts : {
+      description: 'Full name of this person',
+      objType: String
     })
 })
 
@@ -62,9 +66,17 @@ can be specified after the getter.
 If you just want getter/setter support for a property you can specify an
 empty array for the `watch` property or not define it at all.
 
+**METHOD 1:**
 @method computed
 @param {Function} fn The getter for the computed property.
-@param {String} ...watch The properties to watch.
+@param {Array} watch The array of properties to watch.
+@param {Object} opts Options for the computed property
+@return {ComputedProperty}
+
+**METHOD 2:**
+@method computed
+@param {Object} object The object containing the [set/get/watch] property.
+@param {Object} opts Options for the computed property
 @return {ComputedProperty}
 */
 
@@ -76,7 +88,14 @@ module.exports = function (o) {
   if (isFunction(o)) {
     o = {
       watch: arguments[1],
-      get: o
+      get: o,
+      __meta: {
+        opts: arguments[2]
+      }
+    }
+  } else {
+    o.__meta = {
+      opts: arguments[1]
     }
   }
 
@@ -85,7 +104,6 @@ module.exports = function (o) {
   }
 
   o.watch = o.hasOwnProperty('watch') ? [].concat(o.watch) : []
-  o.__meta = {}
   o.__isComputed = true
 
   o.meta = function (m) {

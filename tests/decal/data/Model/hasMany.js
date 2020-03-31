@@ -23,15 +23,15 @@ describe('hasMany', function () {
 
       canRead: decal.computed(function () {
         return this.get('value') >= 1
-      }, 'value'),
+      }, ['value']),
 
       canWrite: decal.computed(function () {
         return this.get('value') >= 2
-      }, 'value'),
+      }, ['value']),
 
       canDelete: decal.computed(function () {
         return this.get('value') >= 3
-      }, 'value')
+      }, ['value'])
     })
 
     Post = decal.Model.extend({

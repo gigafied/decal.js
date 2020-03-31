@@ -110,7 +110,7 @@ let Model = Class.extend({
   */
   adapter: computed(function () {
     return this.store.getAdapterFor(this.constructor)
-  }, 'store'),
+  }, ['store']),
 
   /**
   The modelKey you want to use for the model. This will likely influence your adapter.
@@ -203,7 +203,7 @@ let Model = Class.extend({
 
   isDirty: computed(function () {
     return !!get(this, 'dirtyAttributes.length')
-  }, 'dirtyAttributes.length'),
+  }, ['dirtyAttributes.length']),
 
   /**
   Opposite of isDirty.
@@ -215,7 +215,7 @@ let Model = Class.extend({
 
   isClean: computed(function () {
     return !get(this, 'isDirty')
-  }, 'isDirty'),
+  }, ['isDirty']),
 
   /**
   Is the record new? Determined by the existence of a primary key value.
@@ -227,7 +227,7 @@ let Model = Class.extend({
 
   isNew: computed(function () {
     return !get(this, 'pk')
-  }, 'pk'),
+  }, ['pk']),
 
   /**
   Get the primary key value of the record.
