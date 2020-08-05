@@ -265,11 +265,10 @@ module.exports = Class.extend({
     }
 
     return collection.filter(item => {
-      let doesMatch = true
       for (let p in q) {
-        if (get(item, p) !== q[p]) doesMatch = false
+        if (get(item, p) !== q[p]) return false
       }
-      return doesMatch
+      return true
     })
   },
 
