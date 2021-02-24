@@ -39,6 +39,10 @@ module.exports = function merge (a, b, deep) {
 
     for (let p in b) {
       if (!b.hasOwnProperty(p)) continue
+      // Prototype Pollution https://snyk.io/vuln/SNYK-JS-DECAL-1051028
+      if (p === '__proto__' || p === 'constructor') {
+        continue
+      }
       let o = b[p]
       let d = deep ? arrayOrObject(o) : null
       a[p] = d ? merge(d, o, true) : o

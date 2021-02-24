@@ -39,6 +39,10 @@ module.exports = function extend (target, ...rest) {
         let copy = opts[name]
         // Prevent never-ending loop
         if (target === copy) continue
+        // Prototype Pollution https://snyk.io/vuln/SNYK-JS-DECAL-1051028
+        if (name === '__proto__' || name === 'constructor') {
+          continue
+        }
         // Recurse if we're merging plain objects or arrays
         if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
           if (copyIsArray) {
