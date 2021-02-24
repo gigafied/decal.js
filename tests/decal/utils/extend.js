@@ -64,7 +64,7 @@ describe('extend', function () {
 
     expect(test2[3][0]).to.deep.equal(test[0])
   })
- 
+
   it('should properly defense Prototype Pollution', function () {
     let a = {}
     let b = JSON.parse('{"__proto__": {"pollute": "1"}}')
